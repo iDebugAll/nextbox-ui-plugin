@@ -1,0 +1,3 @@
+include README.md
+recursive-include nextbox_ui_plugin/templates *
+recursive-include nextbox_ui_plugin/static *
