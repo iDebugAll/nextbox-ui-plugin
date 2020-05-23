@@ -3,6 +3,7 @@
 from django.shortcuts import render
 from django.views.generic import View
 from dcim.models import Cable, Device, Interface
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.conf import settings
 import json
 
@@ -189,7 +190,8 @@ def get_site_topology(site_id):
     return topology_dict
 
 
-class TopologyView(View):
+class TopologyView(PermissionRequiredMixin, View):
+    permission_required = ('dcim.view_site', 'dcim.view_device', 'dcim.view_cable')
     def get(self, request, site_id):
         return render(request, 'nextbox_ui_plugin/site_topology.html', {
             'source_data': json.dumps(get_site_topology(site_id))
