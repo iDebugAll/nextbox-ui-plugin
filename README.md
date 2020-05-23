@@ -169,3 +169,10 @@ Nodes are dragable and clickable:
 You can switch between vertical and horizontal layers sort order back and forth. Default is vertical.
 2. Directly via /plugins/nextbox-ui/site_topology/{site_id}. This is helpful in case if you need an embedded topology frame on some of your side resources.
 <br/>
+
+### Required Netbox User Permissions
+The Plugin requires the following user permissions in order to access topology view:
+
+  - dcim | site   | Can read site
+  - dcim | device | Can view device
+  - dcim | cable  | Can view cable
