@@ -17,6 +17,12 @@ $ source /opt/netbox/venv/bin/activate
 (venv) $ pip3 install .
 ```
 
+To ensure NetBox Onboarding plugin is automatically re-installed during future upgrades, create a file named `local_requirements.txt` (if not already existing) in the NetBox root directory (alongside `requirements.txt`) and list the `nextbox-ui-plugin` package:
+
+```no-highlight
+# echo nextbox-ui-plugin >> local_requirements.txt
+```
+
 ### Enable the Plugin
 In a global Netbox **configuration.py** configuration file, update or add PLUGINS parameter:
 ```python
