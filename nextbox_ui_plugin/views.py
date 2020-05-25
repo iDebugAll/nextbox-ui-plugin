@@ -96,6 +96,8 @@ LAYERS_SORT_ORDER = MANUAL_LAYERS_SORT_ORDER or DEFAULT_LAYERS_SORT_ORDER
 MANUAL_ICON_MODEL_MAP = PLUGIN_SETTINGS.get("icon_model_map", "")
 ICON_MODEL_MAP = MANUAL_ICON_MODEL_MAP or DEFAULT_ICON_MODEL_MAP
 
+HIDE_UNCONNECTED = PLUGIN_SETTINGS.get("hide_unconnected", False)
+
 
 def if_shortname(ifname):
     for k, v in interface_full_name_map.items():
@@ -175,11 +177,16 @@ def get_site_topology(site_id):
                 links.append(link)
     if not links:
         return topology_dict
+    devices_seen = set()
     for link in links:
         nb_s_iface = Interface.objects.get(id=link.termination_a_id)
         nb_d_iface = Interface.objects.get(id=link.termination_b_id)
         s_node = nb_s_iface.device.id
         d_node = nb_d_iface.device.id
+        
+        devices_seen.add(link.termination_a.device.id)
+        devices_seen.add(link.termination_b.device.id)
+        
         topology_dict['links'].append({
             'id': link.id,
             'source': s_node,
@@ -187,6 +194,11 @@ def get_site_topology(site_id):
             "srcIfName": if_shortname(nb_s_iface.name),
             "tgtIfName": if_shortname(nb_d_iface.name)
         })
+        
+    if HIDE_UNCONNECTED:
+        # Hide all devices that have no links
+        topology_dict['nodes'] = [device for device in topology_dict['nodes'] if device['id'] in devices_seen]
+        
     return topology_dict
 
 
