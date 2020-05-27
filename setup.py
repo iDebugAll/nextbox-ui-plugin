@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='nextbox_ui_plugin',
-    version='0.2',
+    version='0.3',
     description='Netbox Topology Plugin',
     author='Igor Korotchenkov',
     author_email='iDebugAll@gmail.com',
