@@ -5,14 +5,21 @@
         <meta charset="utf-8">
         <link rel="stylesheet" href="/static/nextbox_ui_plugin/next_sources/css/next.css">
         <script src="/static/nextbox_ui_plugin/next_sources/js/next.js"></script>
-        <script src="/static/nextbox_ui_plugin/next_app.js"></script>
-        <script>
-            var topologyData = {{ source_data|safe }};
-            console.log(topologyData);
+        <script src="/static/nextbox_ui_plugin/button_utils.js"></script>
+        <script type="text/javascript">
+            var displayUnconnected = false;
         </script>
     </head>
     <body>
         <button onclick='horizontal()'>Horizontal Layout</button>
         <button onclick="vertical()">Vertical Layout</button>
+        <input type="button" id="showHideUndonnectedButton" value="" onclick="return showHideUndonnectedButtonOnClick(this);" />
+        <script type="text/javascript">
+            var displayUnconnected = {{ display_unconnected|yesno:"true,false" }};
+            var topologyData = {{ source_data|safe }};
+            console.log(topologyData);
+        </script>
+        <script type="text/javascript">showHideUndonnectedButtonInitial();</script>
+        <script src="/static/nextbox_ui_plugin/next_app.js"></script>
     </body>
 </html>

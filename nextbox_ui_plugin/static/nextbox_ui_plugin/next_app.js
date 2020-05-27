@@ -268,6 +268,32 @@
         });
         topo.activateLayout('hierarchicalLayout');
     };
+    showHideUndonnected = function() {
+        let unconnectedNodes = []
+        topologyData['nodes'].forEach(function(node){
+            var isUnconnected = true
+            topologyData['links'].forEach(function(link){
+                if (link['source'] === node['id'] | link['target'] === node['id']) {
+                    isUnconnected = false;
+                    return;
+                };
+            });
+            if (isUnconnected == true) {
+                unconnectedNodes.push(node['id'])
+            };
+        });
+        console.log(unconnectedNodes)
+        if (unconnectedNodes.length > 0) {
+            unconnectedNodes.forEach(function(nodeID) {
+                topo.graph().getVertex(nodeID).visible(displayUnconnected);
+            });
+            displayUnconnected = !displayUnconnected;
+        };
+    };
+
+    topo.on('topologyGenerated', function(){
+        showHideUndonnected();
+    });
 
     // Create an application instance
     var shell = new Shell();

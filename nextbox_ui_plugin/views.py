@@ -96,6 +96,10 @@ LAYERS_SORT_ORDER = MANUAL_LAYERS_SORT_ORDER or DEFAULT_LAYERS_SORT_ORDER
 MANUAL_ICON_MODEL_MAP = PLUGIN_SETTINGS.get("icon_model_map", "")
 ICON_MODEL_MAP = MANUAL_ICON_MODEL_MAP or DEFAULT_ICON_MODEL_MAP
 
+# Defines whether Devices with no connections
+# are displayed on the topology view by default or not.
+DISPLAY_UNCONNECTED = PLUGIN_SETTINGS.get("DISPLAY_UNCONNECTED", True)
+
 
 def if_shortname(ifname):
     for k, v in interface_full_name_map.items():
@@ -187,8 +191,11 @@ def get_site_topology(site_id):
 
 
 class TopologyView(PermissionRequiredMixin, View):
+    """Site Topology View"""
     permission_required = ('dcim.view_site', 'dcim.view_device', 'dcim.view_cable')
+
     def get(self, request, site_id):
         return render(request, 'nextbox_ui_plugin/site_topology.html', {
-            'source_data': json.dumps(get_site_topology(site_id))
+            'source_data': json.dumps(get_site_topology(site_id)),
+            'display_unconnected': DISPLAY_UNCONNECTED
         })

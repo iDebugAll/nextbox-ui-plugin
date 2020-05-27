@@ -43,6 +43,7 @@ Optionally, update a PLUGINS_CONFIG parameter in **configuration.py** to rewrite
 #            ADD YOUR SETTINGS HERE
 #            icon_model_map is a dict
 #        },
+#        'DISPLAY_UNCONNECTED': True|False
 #    }
 #}
 ```
@@ -122,6 +123,14 @@ By default, the Plugin automatically tries to identify the device icon type base
 Keys are searched substrings. Values should be valid icon types as listed above.
 
 3. Default value is 'unknown' (renders as a question mark icon).
+<br/>
+
+The Plugin can control the visibility of the layers and/or specific nodes on the topology view.<br/>
+The visibility control is currently implemented for unconnected devices.<br/>
+Initial visibility behavior for unconnected nodes is controlled by DISPLAY_UNCONNECTED boolean plugin parameter.<br/>
+By default unconnected nodes are being displayed. Set DISPLAY_UNCONNECTED to False to hide them on initial topology view load.<br/>
+A separate 'Hide/Display Unconnected' button may then be used to hide or display those nodes.
+
 
 ### Collect Static Files
 The Plugin contains static files for topology visualization. They should be served directly by the HTTP frontend. In order to collect them from the package to the Netbox static root directory use the following command:
