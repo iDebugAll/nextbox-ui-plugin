@@ -119,7 +119,7 @@ By default, the Plugin automatically tries to identify the device icon type base
     'ASA': 'firewall',
 }
 ```
-Keys are searched substrings. Keys should be valid icon types as listed above.
+Keys are searched substrings. Values should be valid icon types as listed above.
 
 3. Default value is 'unknown' (renders as a question mark icon).
 
@@ -171,8 +171,8 @@ Site topology visualization may be accessed in two different ways:
 The topology visualization will open in a pop-up window:
 ![](samples/sample_topology_view.png)
 Nodes are dragable and clickable:
-![](samples/sample_node_tooltip_content.png)
-You can switch between vertical and horizontal layers sort order back and forth. Default is vertical.
+![](samples/sample_node_tooltip_content.png)<br/>
+You can switch between vertical and horizontal layers sort order back and forth. Default is vertical.<br/>
 2. Directly via /plugins/nextbox-ui/site_topology/{site_id}. This is helpful in case if you need an embedded topology frame on some of your side resources.
 <br/>
 
