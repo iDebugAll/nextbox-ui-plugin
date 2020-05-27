@@ -176,16 +176,12 @@ def get_site_topology(site_id):
     if not links:
         return topology_dict
     for link in links:
-        nb_s_iface = Interface.objects.get(id=link.termination_a_id)
-        nb_d_iface = Interface.objects.get(id=link.termination_b_id)
-        s_node = nb_s_iface.device.id
-        d_node = nb_d_iface.device.id
         topology_dict['links'].append({
             'id': link.id,
-            'source': s_node,
-            'target': d_node,
-            "srcIfName": if_shortname(nb_s_iface.name),
-            "tgtIfName": if_shortname(nb_d_iface.name)
+            'source': link.termination_a.device.id,
+            'target': link.termination_b.device.id,
+            "srcIfName": if_shortname(link.termination_a.name),
+            "tgtIfName": if_shortname(link.termination_b.name)
         })
     return topology_dict
 
