@@ -298,8 +298,30 @@
         });
     };
 
+    showHideLogicalMultiCableLinks = function() {
+        topologyData['links'].forEach(function(link){
+            if (link['isLogicalMultiCable']) {
+                topo.getLink(link['id']).visible(displayLogicalMultiCableLinks);
+            };
+        });
+        displayLogicalMultiCableLinks = !displayLogicalMultiCableLinks
+    };
+
+    showHidePassiveDevices = function() {
+        topologyData['nodes'].forEach(function(node){
+            if ('isPassive' in node) {
+                if (node['isPassive']) {
+                    topo.graph().getVertex(node['id']).visible(displayPassiveDevices);
+                };
+            };
+        });
+        displayPassiveDevices = !displayPassiveDevices
+    };
+
     topo.on('topologyGenerated', function(){
         showHideUndonnected();
+        showHidePassiveDevices();
+        showHideLogicalMultiCableLinks();
         undisplayedRoles.forEach(function(deviceRole){
             showHideDeviceRoles(deviceRole, false);
         });
