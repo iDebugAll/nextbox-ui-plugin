@@ -194,7 +194,6 @@ def get_site_topology(site_id):
             "srcIfName": if_shortname(link.termination_a.name),
             "tgtIfName": if_shortname(link.termination_b.name)
         })
-    print(device_roles)
     return topology_dict, device_roles
 
 

@@ -1,6 +1,5 @@
 function showHideUndonnectedButtonInitial() {
     showHideUndonnectedButton = document.getElementById("showHideUndonnectedButton");
-    console.log(showHideUndonnectedButton);
     if (displayUnconnected == false) {
         showHideUndonnectedButton.value = 'Display Unconnected'
     } else {
@@ -18,10 +17,5 @@ function showHideUndonnectedButtonOnClick(button) {
 };
 
 function layerSelectorOnChange(checkbox){
-    showHideDeviceRoles(checkbox.value, checkbox.checked)
-    if (checkbox.checked) {
-        console.log('checked: ' + checkbox.value)
-    } else {
-        console.log('unchecked: ' + checkbox.value)
-    };
+    showHideDeviceRoles(checkbox.value, checkbox.checked);
 };

@@ -255,8 +255,6 @@
             return;
         };
         var currentTopoData = topo.graph().getData();
-        console.log(currentTopoData);
-        console.log(currentTopoData["nodes"]);
         if (currentTopoData < 1) {
             return;
         };
@@ -282,7 +280,7 @@
                 unconnectedNodes.push(node['id'])
             };
         });
-        console.log(unconnectedNodes)
+
         if (unconnectedNodes.length > 0) {
             unconnectedNodes.forEach(function(nodeID) {
                 topo.graph().getVertex(nodeID).visible(displayUnconnected);
