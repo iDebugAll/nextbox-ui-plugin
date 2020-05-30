@@ -190,8 +190,8 @@ Site topology visualization may be accessed in two different ways:
 1. By clicking a custom plugin Topology button on a Site page.
 ![](samples/sample_topology_button.png)
 The topology visualization will open in a pop-up window:
-![](samples/sample_topology_view.png)
-Nodes are dragable and clickable:
+![](samples/sample_topology_view.png)<br/>
+Nodes are draggable and clickable:
 ![](samples/sample_node_tooltip_content.png)<br/>
 You can switch between vertical and horizontal layers sort order back and forth. Default is vertical.<br/>
 2. Directly via /plugins/nextbox-ui/site_topology/{site_id}. This is helpful in case if you need an embedded topology frame on some of your side resources.
