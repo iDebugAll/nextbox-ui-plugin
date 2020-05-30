@@ -100,6 +100,9 @@ ICON_MODEL_MAP = MANUAL_ICON_MODEL_MAP or DEFAULT_ICON_MODEL_MAP
 # are displayed on the topology view by default or not.
 DISPLAY_UNCONNECTED = PLUGIN_SETTINGS.get("DISPLAY_UNCONNECTED", True)
 
+# Hide these roles by default
+UNDISPLAYED_DEVICE_ROLE_SLUGS = PLUGIN_SETTINGS.get("undisplayed_device_role_slugs", tuple())
+
 
 def if_shortname(ifname):
     for k, v in interface_full_name_map.items():
@@ -146,11 +149,12 @@ def get_icon_type(device_id):
 
 def get_site_topology(site_id):
     topology_dict = {'nodes': [], 'links': []}
+    device_roles = set()
     if not site_id:
-        return topology_dict
+        return topology_dict, device_roles
     nb_devices = Device.objects.filter(site_id=site_id)
     if not nb_devices:
-        return topology_dict
+        return topology_dict, device_roles
     links = []
     device_ids = [d.id for d in nb_devices]
     for nb_device in nb_devices:
@@ -163,6 +167,7 @@ def get_site_topology(site_id):
             'primaryIP': primary_ip,
             'serial_number': nb_device.serial,
             'model': nb_device.device_type.model,
+            'deviceRole': nb_device.device_role.slug,
             'layerSortPreference': get_node_layer_sort_preference(
                 nb_device.device_role.slug
             ),
@@ -170,6 +175,8 @@ def get_site_topology(site_id):
                 nb_device.id
             ),
         })
+        is_visible = not (nb_device.device_role.slug in UNDISPLAYED_DEVICE_ROLE_SLUGS)
+        device_roles.add((nb_device.device_role.slug, nb_device.device_role.name, is_visible))
         links_from_device = Cable.objects.filter(_termination_a_device_id=nb_device.id)
         if not links_from_device:
             continue
@@ -178,7 +185,7 @@ def get_site_topology(site_id):
             if link._termination_b_device_id in device_ids:
                 links.append(link)
     if not links:
-        return topology_dict
+        return topology_dict, device_roles
     for link in links:
         topology_dict['links'].append({
             'id': link.id,
@@ -187,7 +194,7 @@ def get_site_topology(site_id):
             "srcIfName": if_shortname(link.termination_a.name),
             "tgtIfName": if_shortname(link.termination_b.name)
         })
-    return topology_dict
+    return topology_dict, device_roles
 
 
 class TopologyView(PermissionRequiredMixin, View):
@@ -195,7 +202,10 @@ class TopologyView(PermissionRequiredMixin, View):
     permission_required = ('dcim.view_site', 'dcim.view_device', 'dcim.view_cable')
 
     def get(self, request, site_id):
+        topology_dict, device_roles = get_site_topology(site_id)
         return render(request, 'nextbox_ui_plugin/site_topology.html', {
-            'source_data': json.dumps(get_site_topology(site_id)),
-            'display_unconnected': DISPLAY_UNCONNECTED
+            'source_data': json.dumps(topology_dict),
+            'display_unconnected': DISPLAY_UNCONNECTED,
+            'device_roles': device_roles,
+            'undisplayed_roles': list(UNDISPLAYED_DEVICE_ROLE_SLUGS)
         })
