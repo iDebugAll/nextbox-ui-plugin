@@ -43,6 +43,12 @@ Optionally, update a PLUGINS_CONFIG parameter in **configuration.py** to rewrite
 #            ADD YOUR SETTINGS HERE
 #            icon_model_map is a dict
 #        },
+#        'undisplayed_device_role_slugs': (
+# #          ADD YOUR SETTINGS HERE
+#            undisplayed_device_role_slugs value is a list or a tuple
+#            Listed device role slugs are hidden on initial view load,
+#            you may then hide/display any layer with a control button.
+#        ),
 #        'DISPLAY_UNCONNECTED': True|False
 #    }
 #}
@@ -123,13 +129,19 @@ By default, the Plugin automatically tries to identify the device icon type base
 Keys are searched substrings. Values should be valid icon types as listed above.
 
 3. Default value is 'unknown' (renders as a question mark icon).
-<br/>
+<br/><br/>
 
 The Plugin can control the visibility of the layers and/or specific nodes on the topology view.<br/>
-The visibility control is currently implemented for unconnected devices.<br/>
-Initial visibility behavior for unconnected nodes is controlled by DISPLAY_UNCONNECTED boolean plugin parameter.<br/>
-By default unconnected nodes are being displayed. Set DISPLAY_UNCONNECTED to False to hide them on initial topology view load.<br/>
-A separate 'Hide/Display Unconnected' button may then be used to hide or display those nodes.
+The visibility control is currently implemented for unconnected devices and specific device roles:<br/>
+
+  - Initial visibility behavior for unconnected nodes is controlled by DISPLAY_UNCONNECTED boolean plugin parameter.<br/>
+  By default unconnected nodes are being displayed. Set DISPLAY_UNCONNECTED to False to hide them on initial topology view load.<br/>
+  A separate 'Hide/Display Unconnected' button may then be used to hide or display those nodes.
+
+  - Inifial visibility behavior for specific device roles is controlled by 'undisplayed_device_role_slugs' plugin parameter. Listed device role slugs are hidden on initial view load, you may then hide/display any layer with a control button on the topology view page.<br/>
+
+  ![](samples/sample_layer_visibility.png)
+
 
 
 ### Collect Static Files
