@@ -291,8 +291,20 @@
         };
     };
 
+    showHideDeviceRoles = function(deviceRole, isVisible) {
+        let devicesByRole = []
+        topologyData['nodes'].forEach(function(node){
+            if (node['deviceRole'] == deviceRole) {
+                topo.graph().getVertex(node['id']).visible(isVisible);
+            };
+        });
+    };
+
     topo.on('topologyGenerated', function(){
         showHideUndonnected();
+        undisplayedRoles.forEach(function(deviceRole){
+            showHideDeviceRoles(deviceRole, false);
+        });
     });
 
     // Create an application instance
