@@ -321,6 +321,9 @@
     topo.on('topologyGenerated', function(){
         showHideUndonnected();
         showHidePassiveDevices();
+        if (displayPassiveDevices) {
+            displayLogicalMultiCableLinks = true;
+        };
         showHideLogicalMultiCableLinks();
         undisplayedRoles.forEach(function(deviceRole){
             showHideDeviceRoles(deviceRole, false);
