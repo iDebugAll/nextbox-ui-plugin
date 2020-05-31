@@ -49,6 +49,8 @@ Optionally, update a PLUGINS_CONFIG parameter in **configuration.py** to rewrite
 #            Listed device role slugs are hidden on initial view load,
 #            you may then hide/display any layer with a control button.
 #        ),
+#        'DISPLAY_PASSIVE_DEVICES': True|False,
+#        'DISPLAY_LOGICAL_MULTICABLE_LINKS': True|False,
 #        'DISPLAY_UNCONNECTED': True|False
 #    }
 #}
@@ -132,15 +134,17 @@ Keys are searched substrings. Values should be valid icon types as listed above.
 <br/><br/>
 
 The Plugin can control the visibility of the layers and/or specific nodes on the topology view.<br/>
-The visibility control is currently implemented for unconnected devices and specific device roles:<br/>
+The visibility control is currently implemented for specific device roles, unconnected devices, and passive devices:<br/>
+
+  - Inifial visibility behavior for specific device roles is controlled by 'undisplayed_device_role_slugs' plugin parameter. Listed device role slugs are hidden on initial view load, you may then hide/display any layer with a control button on the topology view page.<br/>
 
   - Initial visibility behavior for unconnected nodes is controlled by DISPLAY_UNCONNECTED boolean plugin parameter.<br/>
   By default unconnected nodes are being displayed. Set DISPLAY_UNCONNECTED to False to hide them on initial topology view load.<br/>
   A separate 'Hide/Display Unconnected' button may then be used to hide or display those nodes.
 
-  - Inifial visibility behavior for specific device roles is controlled by 'undisplayed_device_role_slugs' plugin parameter. Listed device role slugs are hidden on initial view load, you may then hide/display any layer with a control button on the topology view page.<br/>
+  - Initical visibility for passive devices (patch pannels, PDUs) is controlled by DISPLAY_PASSIVE_DEVICES boolean plugin parameter. A device is considered passive if it has cables connected to Front and Rear Ports only and not to Interfaces.<br/>Passive devices are hidden by default. You can display them with 'Display Passive Devices' button on the topology view page. <br/>
+  Actual multi-cable connections between the end-devices a replaced by the direct logical connection once the passive devices are hidden. This logical direct link may be displayed regardless of the passive devices visibility in addition to the cabling across patch pannels if you set DISPLAY_LOGICAL_MULTICABLE_LINKS plugin paramenter to True. DISPLAY_LOGICAL_MULTICABLE_LINKS is set to False by default. This parameter only affects the initical logical link visibility. With hidden passive devices, it is always being displayed.<br/>
 
-  ![](samples/sample_layer_visibility.png)
 
 
 
@@ -196,6 +200,23 @@ Nodes are draggable and clickable:
 You can switch between vertical and horizontal layers sort order back and forth. Default is vertical.<br/>
 2. Directly via /plugins/nextbox-ui/site_topology/{site_id}. This is helpful in case if you need an embedded topology frame on some of your side resources.
 <br/>
+
+### Visibility control
+
+You can display or hide any specific device roles on the topology view with 'Select Layer' button:
+![](samples/sample_layer_visibility.png)<br/>
+The list of available device roles is generated automatically based on discovered devices for a visualized site.<br/>
+<br/>
+'Display/Hide Unconnected' button hides or displays the devices with no links attached.<br/>
+<br/>
+'Display/Hide Passive Devices' buttons hides or displays the passive devices (patch pannels, PDUs, etc).<br/>
+<br/>
+In a samples below, edge-sw01 is connected with core-rtr01 and core-rtr02 through Patch Panel A and Patch Panel B with multiple cable hops:<br/>
+![](samples/sample_patch_panels.png)<br/>
+Once you hide the passive devices (default state), a logical direct link shows up between the edge switch and the core routers:<br/>
+![](samples/sample_hide_passive.png)<br/>
+If DISPLAY_LOGICAL_MULTICABLE_LINKS is set to True (default is False) this logical link is displayed initially:<br/>
+![](samples/sample_display_logical_link.png)
 
 ### Required Netbox User Permissions
 The Plugin requires the following user permissions in order to access topology view:
