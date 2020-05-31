@@ -188,7 +188,7 @@ Netbox Community Docker setup performs static files collection on every startup.
 
 # Usage
 
-Once installed and initialized, the Plugin runs on a backend. It currently supports topology visualization for Netbox Sites. Only direct Cables between the Devices are currently supported for links visualization. Devices without any connections are displayed on the topology.<br/>
+Once installed and initialized, the Plugin runs on a backend. It currently supports topology visualization for Netbox Sites.<br/>
 <br/>
 Site topology visualization may be accessed in two different ways:
 1. By clicking a custom plugin Topology button on a Site page.
