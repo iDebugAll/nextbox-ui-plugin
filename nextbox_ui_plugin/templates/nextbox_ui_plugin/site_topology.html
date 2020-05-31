@@ -25,6 +25,9 @@
                 <input class="btn btn-outline-secondary btn-sm" type="button" id="showHideUndonnectedButton" value="" onclick="return showHideUndonnectedButtonOnClick(this);" />
               </div>
               <div class="col-xs-4 ml-2">
+                <input class="btn btn-outline-secondary btn-sm" type="button" id="showHidePassiveDevicesButton" value="" onclick="return showHidePassiveDevicesButtonOnClick(this);" />
+              </div>
+              <div class="col-xs-4 ml-2">
                 <div class="dropdown">
                     <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                       Select Layers
@@ -44,11 +47,16 @@
         </div>
         <script type="text/javascript">
             var displayUnconnected = {{ display_unconnected|yesno:"true,false" }};
+            var displayPassiveDevices = {{ display_passive_devices|yesno:"true,false" }};
+            var displayLogicalMultiCableLinks = {{ display_logical_multicable_links|yesno:"true,false" }};
             var undisplayedRoles = {{ undisplayed_roles|safe }};
             var topologyData = {{ source_data|safe }};
             console.log(topologyData);
         </script>
-        <script type="text/javascript">showHideUndonnectedButtonInitial();</script>
+        <script type="text/javascript">
+            showHideUndonnectedButtonInitial();
+            showHidePassiveDevicesButtonInitial();
+        </script>
         <script src="/static/nextbox_ui_plugin/next_app.js"></script>
         <script src="{% static 'jquery/jquery-3.4.1.min.js' %}"></script>
         <script src="{% static 'jquery-ui-1.12.1/jquery-ui.min.js' %}"></script>
