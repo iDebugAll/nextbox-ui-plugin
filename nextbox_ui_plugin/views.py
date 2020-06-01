@@ -217,6 +217,8 @@ def get_site_topology(site_id):
             # Include links to devices from the same Site only
             if link._termination_b_device_id in device_ids:
                 links.append(link)
+    device_roles = list(device_roles)
+    device_roles.sort(key=lambda i: get_node_layer_sort_preference(i[0]))
     if not links:
         return topology_dict, device_roles, multi_cable_connections
     link_ids = set()
