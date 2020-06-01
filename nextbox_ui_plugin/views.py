@@ -113,6 +113,11 @@ DISPLAY_PASSIVE_DEVICES = PLUGIN_SETTINGS.get("DISPLAY_PASSIVE_DEVICES", False)
 # Hide these roles by default
 UNDISPLAYED_DEVICE_ROLE_SLUGS = PLUGIN_SETTINGS.get("undisplayed_device_role_slugs", tuple())
 
+# Defines the initial layer alignment direction on the view
+INITIAL_LAYOUT = PLUGIN_SETTINGS.get("INITIAL_LAYOUT", 'vertical')
+if INITIAL_LAYOUT not in ('vertical', 'horizontal', 'auto'):
+    INITIAL_LAYOUT = 'vertical'
+
 
 def if_shortname(ifname):
     for k, v in interface_full_name_map.items():
@@ -260,4 +265,5 @@ class TopologyView(PermissionRequiredMixin, View):
             'undisplayed_roles': list(UNDISPLAYED_DEVICE_ROLE_SLUGS),
             'display_logical_multicable_links': DISPLAY_LOGICAL_MULTICABLE_LINKS,
             'display_passive_devices': DISPLAY_PASSIVE_DEVICES,
+            'initial_layout': INITIAL_LAYOUT,
         })

@@ -51,7 +51,8 @@ Optionally, update a PLUGINS_CONFIG parameter in **configuration.py** to rewrite
 #        ),
 #        'DISPLAY_PASSIVE_DEVICES': True|False,
 #        'DISPLAY_LOGICAL_MULTICABLE_LINKS': True|False,
-#        'DISPLAY_UNCONNECTED': True|False
+#        'DISPLAY_UNCONNECTED': True|False,
+#        'INITIAL_LAYOUT': 'vertical'|'horizontal'|'auto'
 #    }
 #}
 ```
@@ -144,7 +145,10 @@ The visibility control is currently implemented for specific device roles, uncon
 
   - Initical visibility for passive devices (patch pannels, PDUs) is controlled by DISPLAY_PASSIVE_DEVICES boolean plugin parameter. A device is considered passive if it has cables connected to Front and Rear Ports only and not to Interfaces.<br/>Passive devices are hidden by default. You can display them with 'Display Passive Devices' button on the topology view page. <br/>
   Actual multi-cable connections between the end-devices a replaced by the direct logical connection once the passive devices are hidden. This logical direct link may be displayed regardless of the passive devices visibility in addition to the cabling across patch pannels if you set DISPLAY_LOGICAL_MULTICABLE_LINKS plugin paramenter to True. DISPLAY_LOGICAL_MULTICABLE_LINKS is set to False by default. This parameter only affects the initical logical link visibility. With hidden passive devices, it is always being displayed.<br/>
+<br/>
 
+Device role based layers are ordered vertically by default. You can control this behavior with INITIAL_LAYOUT plugin parameter. Valid options are 'vertical', 'horizontal', and 'auto'.<br/>
+'auto' layout relies on NeXt UI dataprocessor best-effort algorithms. It spreads the Nodes across the view so they would be as distant from each other as possible. You may use it if the vertical and horizontal initial layout does not work properly in your browser (this is the issue to be fixed).
 
 
 

@@ -51,6 +51,7 @@
             var displayLogicalMultiCableLinks = {{ display_logical_multicable_links|yesno:"true,false" }};
             var undisplayedRoles = {{ undisplayed_roles|safe }};
             var topologyData = {{ source_data|safe }};
+            var initialLayout = '{{ initial_layout|safe }}';
             console.log(topologyData);
         </script>
         <script type="text/javascript">

@@ -70,11 +70,11 @@
             start: function () {
                 // Read topology data from variable
                 topo.data(topologyData);
-                // Use vertical alignment by default
                 
-                if (topologyData["nodes"].length > 0) {
+                // set initial layer alignment direction
+                if (topologyData["nodes"].length > 0 & (initialLayout == 'vertical' | initialLayout == 'horizontal')) {
                     var layout = topo.getLayout('hierarchicalLayout');
-                    layout.direction('vertical');
+                    layout.direction(initialLayout);
                     layout.levelBy(function(node, model) {
                     return model.get('layerSortPreference');
                     });
@@ -232,7 +232,7 @@
         }
     });
 
-    var currentLayout = 'vertical'
+    var currentLayout = initialLayout;
 
     horizontal = function() {
         if (currentLayout === 'horizontal') {
