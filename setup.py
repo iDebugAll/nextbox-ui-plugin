@@ -9,6 +9,7 @@ setup(
     name='nextbox_ui_plugin',
     version='0.4.1',
     url='https://github.com/iDebugAll/nextbox-ui-plugin',
+    download_url='https://github.com/iDebugAll/nextbox-ui-plugin/archive/v0.4.1.tar.gz',
     description='A topology visualization plugin for Netbox powered by NextUI Toolkit.',
     long_description=long_description,
     long_description_content_type='text/markdown',
