@@ -3,7 +3,6 @@
 from django.shortcuts import render
 from django.views.generic import View
 from dcim.models import Cable, Device, Interface
-from dcim.models.device_components import CableTermination
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.conf import settings
 import json
