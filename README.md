@@ -3,12 +3,19 @@
 A topology visualization plugin for [Netbox](https://github.com/netbox-community/netbox) powered by [NextUI](https://developer.cisco.com/site/neXt/) Toolkit. Netbox v2.8.0+ is required.
 
 # Installation
-The Plugin currently requires a manual installation.<br/>
-The source code is available on [GitHub](https://github.com/iDebugAll/nextbox-ui-plugin).
 
 General installation steps and considerations follow the [official guidelines](https://netbox.readthedocs.io/en/stable/plugins/).
 
-### Package Installation
+### Package Installation from PyPi
+
+Assuming you use a Virtual Environment for Netbox:
+```
+$ source /opt/netbox/venv/bin/activate
+(venv) $ pip3 install nextbox-ui-plugin
+```
+
+### Package Installation from Source Code
+The source code is available on [GitHub](https://github.com/iDebugAll/nextbox-ui-plugin).<br/>
 Download and install the package. Assuming you use a Virtual Environment for Netbox:
 ```
 $ git clone https://github.com/iDebugAll/nextbox-ui-plugin
