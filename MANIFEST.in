@@ -1,3 +1,4 @@
 include README.md
+include LICENSE
 recursive-include nextbox_ui_plugin/templates *
 recursive-include nextbox_ui_plugin/static *
