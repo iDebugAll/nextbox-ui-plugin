@@ -5,12 +5,12 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <link rel="stylesheet" href="/static/nextbox_ui_plugin/next_sources/css/next.css">
-        <script src="/static/nextbox_ui_plugin/next_sources/js/next.js"></script>
-        <script src="/static/nextbox_ui_plugin/button_utils.js"></script>
-        <link rel="stylesheet"href="/static/nextbox_ui_plugin/css/site_topology.css">
-        <link rel="stylesheet"href="/static/nextbox_ui_plugin/bootstrap.min.css">
+        <link rel="stylesheet"href="{% static 'nextbox_ui_plugin/next_sources/css/next.css' %}">
+        <link rel="stylesheet"href="{% static 'nextbox_ui_plugin/css/site_topology.css' %}">
+        <link rel="stylesheet"href="{% static 'nextbox_ui_plugin/bootstrap.min.css' %}">
         <link rel="stylesheet"href="{% static 'font-awesome-4.7.0/css/font-awesome.min.css' %}">
+        <script src="{% static 'nextbox_ui_plugin/next_sources/js/next.js' %}"></script>
+        <script src="{% static 'nextbox_ui_plugin/button_utils.js' %}"></script>
     </head>
     <body>
         <div class="container-sm ml-4 my-sm-3">
@@ -58,9 +58,9 @@
             showHideUndonnectedButtonInitial();
             showHidePassiveDevicesButtonInitial();
         </script>
-        <script src="/static/nextbox_ui_plugin/next_app.js"></script>
+        <script src="{% static 'nextbox_ui_plugin/next_app.js' %}"></script>
         <script src="{% static 'jquery/jquery-3.4.1.min.js' %}"></script>
         <script src="{% static 'jquery-ui-1.12.1/jquery-ui.min.js' %}"></script>
-        <script src="/static/nextbox_ui_plugin/bootstrap.bundle.min.js"></script>
+        <script src="{% static 'nextbox_ui_plugin/bootstrap.bundle.min.js' %}"></script>
     </body>
 </html>
