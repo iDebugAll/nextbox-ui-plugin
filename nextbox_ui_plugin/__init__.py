@@ -4,7 +4,7 @@ class NextBoxUIConfig(PluginConfig):
     name = 'nextbox_ui_plugin'
     verbose_name = 'NextBox UI'
     description = 'Test'
-    version = '0.4.3'
+    version = '0.4.4'
     author = 'Igor Korotchenkov'
     author_email = 'iDebugAll@gmail.com'
     base_url = 'nextbox-ui'
