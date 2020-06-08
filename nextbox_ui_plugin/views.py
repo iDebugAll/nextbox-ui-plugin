@@ -88,6 +88,22 @@ DEFAULT_ICON_MODEL_MAP = {
 }
 
 
+DEFAULT_ICON_ROLE_MAP = {
+    'border': 'router',
+    'edge-switch': 'switch',
+    'edge-router': 'router',
+    'core-router': 'router',
+    'core-switch': 'switch',
+    'distribution': 'switch',
+    'distribution-router': 'router',
+    'distribution-switch': 'switch',
+    'leaf': 'switch',
+    'spine': 'switch',
+    'access': 'switch',
+    'access-switch': 'switch',
+}
+
+
 PLUGIN_SETTINGS = settings.PLUGINS_CONFIG.get("nextbox_ui_plugin", dict())
 
 MANUAL_LAYERS_SORT_ORDER = PLUGIN_SETTINGS.get("layers_sort_order", "")
@@ -95,6 +111,9 @@ LAYERS_SORT_ORDER = MANUAL_LAYERS_SORT_ORDER or DEFAULT_LAYERS_SORT_ORDER
 
 MANUAL_ICON_MODEL_MAP = PLUGIN_SETTINGS.get("icon_model_map", "")
 ICON_MODEL_MAP = MANUAL_ICON_MODEL_MAP or DEFAULT_ICON_MODEL_MAP
+
+MANUAL_ICON_ROLE_MAP = PLUGIN_SETTINGS.get("icon_role_map", "")
+ICON_ROLE_MAP = MANUAL_ICON_ROLE_MAP or DEFAULT_ICON_ROLE_MAP
 
 # Defines whether Devices with no connections
 # are displayed on the topology view by default or not.
@@ -146,7 +165,8 @@ def get_icon_type(device_id):
     Selection order:
     1. Based on 'icon_{icon_type}' tag in Netbox device
     2. Based on Netbox device type and ICON_MODEL_MAP
-    3. Default 'undefined'
+    3. Based on Netbox device role and ICON_ROLE_MAP
+    4. Default 'undefined'
     """
     nb_device = Device.objects.get(id=device_id)
     if not nb_device:
@@ -157,6 +177,9 @@ def get_icon_type(device_id):
                 return tag.replace('icon_', '')
     for model_base, icon_type in ICON_MODEL_MAP.items():
         if model_base in str(nb_device.device_type.model):
+            return icon_type
+    for role_slug, icon_type in ICON_ROLE_MAP.items():
+        if str(nb_device.device_role.slug) == role_slug:
             return icon_type
     return 'unknown'
 

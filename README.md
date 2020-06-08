@@ -50,6 +50,10 @@ Optionally, update a PLUGINS_CONFIG parameter in **configuration.py** to rewrite
 #            ADD YOUR SETTINGS HERE
 #            icon_model_map is a dict
 #        },
+#        'icon_role_map': {
+#            ADD YOUR SETTINGS HERE
+#            icon_role_map is a dict
+#        }
 #        'undisplayed_device_role_slugs': (
 # #          ADD YOUR SETTINGS HERE
 #            undisplayed_device_role_slugs value is a list or a tuple
@@ -136,9 +140,29 @@ By default, the Plugin automatically tries to identify the device icon type base
     'ASA': 'firewall',
 }
 ```
-Keys are searched substrings. Values should be valid icon types as listed above.
+Keys are searched substrings. Values should be valid icon types as listed above.<br/>
 
-3. Default value is 'unknown' (renders as a question mark icon).
+3. If no match found on steps 1-2, the Plugin checks the Device Role to Icon mapping.<br/>
+This mapping may be defined within 'icon_role_map' dict in Plugin parameters.<br/>
+Default mapping already contains some general categories:
+```
+{
+    'border': 'router',
+    'edge-switch': 'switch',
+    'edge-router': 'router',
+    'core-router': 'router',
+    'core-switch': 'switch',
+    'distribution': 'switch',
+    'distribution-router': 'router',
+    'distribution-switch': 'switch',
+    'leaf': 'switch',
+    'spine': 'switch',
+    'access': 'switch',
+    'access-switch': 'switch',
+}
+```
+
+4. Default value is 'unknown' (renders as a question mark icon).
 <br/><br/>
 
 The Plugin can control the visibility of the layers and/or specific nodes on the topology view.<br/>
