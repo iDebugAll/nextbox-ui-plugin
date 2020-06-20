@@ -32,6 +32,8 @@
                       Select Layers
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <h6 class="dropdown-header">Device Roles</h6>
+                        <div class="dropdown-divider"></div>
                         {% for device_role_slug, device_role_name, is_visible in device_roles %}
                             <div class="checkbox ml-1 my-1">
                                 <label>
@@ -39,6 +41,18 @@
                                 </label>
                             </div>
                         {% endfor %}
+                        <div class="dropdown-divider"></div>
+                        {% if device_tags %}
+                          <h6 class="dropdown-header">Device Tags</h6>
+                          {% for tag, is_visible in device_tags %}
+                              <div class="checkbox ml-1 my-1">
+                                  <label>
+                                      <input onchange="layerSelectorByTagOnChange(this)" type="checkbox" value="{{ tag }}" {{ is_visible|yesno:"checked," }}>{{ tag }}
+                                  </label>
+                              </div>
+                          {% endfor %}
+                        {% endif %}
+                        <div class="dropdown-divider"></div>
                     </div>
                   </div>
               </div>
@@ -49,6 +63,7 @@
             var displayPassiveDevices = {{ display_passive_devices|yesno:"true,false" }};
             var displayLogicalMultiCableLinks = {{ display_logical_multicable_links|yesno:"true,false" }};
             var undisplayedRoles = {{ undisplayed_roles|safe }};
+            var undisplayedDeviceTags = {{ undisplayed_device_tags|safe }};
             var topologyData = {{ source_data|safe }};
             var initialLayout = '{{ initial_layout|safe }}';
             console.log(topologyData);

@@ -6,6 +6,7 @@ from dcim.models import Cable, Device, Interface
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.conf import settings
 import json
+import re
 
 
 # Default NeXt UI icons
@@ -131,6 +132,13 @@ DISPLAY_PASSIVE_DEVICES = PLUGIN_SETTINGS.get("DISPLAY_PASSIVE_DEVICES", False)
 # Hide these roles by default
 UNDISPLAYED_DEVICE_ROLE_SLUGS = PLUGIN_SETTINGS.get("undisplayed_device_role_slugs", tuple())
 
+# Hide devices tagged with these tags
+UNDISPLAYED_DEVICE_TAGS = PLUGIN_SETTINGS.get("undisplayed_device_tags", tuple())
+
+# Filter device tags listed in Select Layers menu
+SELECT_LAYERS_LIST_INCLUDE_DEVICE_TAGS = PLUGIN_SETTINGS.get("select_layers_list_include_device_tags", tuple())
+SELECT_LAYERS_LIST_EXCLUDE_DEVICE_TAGS = PLUGIN_SETTINGS.get("select_layers_list_exclude_device_tags", tuple())
+
 # Defines the initial layer alignment direction on the view
 INITIAL_LAYOUT = PLUGIN_SETTINGS.get("INITIAL_LAYOUT", 'vertical')
 if INITIAL_LAYOUT not in ('vertical', 'horizontal', 'auto'):
@@ -184,15 +192,48 @@ def get_icon_type(device_id):
     return 'unknown'
 
 
+def tag_is_hidden(tag):
+    for tag_regex in UNDISPLAYED_DEVICE_TAGS:
+        if re.search(tag_regex, tag):
+            return True
+    return False
+
+
+def filter_tags(tags):
+    if not tags:
+        return []
+    if SELECT_LAYERS_LIST_INCLUDE_DEVICE_TAGS:
+        filtered_tags = []
+        for tag in tags:
+            for tag_regex in SELECT_LAYERS_LIST_INCLUDE_DEVICE_TAGS:
+                if re.search(tag_regex, tag):
+                    filtered_tags.append(tag)
+                    break
+            if tag_is_hidden(tag):
+                filtered_tags.append(tag)
+        tags = filtered_tags
+    if SELECT_LAYERS_LIST_EXCLUDE_DEVICE_TAGS:
+        filtered_tags = []
+        for tag in tags:
+            for tag_regex in SELECT_LAYERS_LIST_EXCLUDE_DEVICE_TAGS:
+                if re.search(tag_regex, tag) and not tag_is_hidden(tag):
+                    break
+            else:
+                filtered_tags.append(tag)
+        tags = filtered_tags
+    return tags
+
+
 def get_site_topology(site_id):
     topology_dict = {'nodes': [], 'links': []}
     device_roles = set()
+    site_device_tags = set()
     multi_cable_connections = []
     if not site_id:
-        return topology_dict, device_roles, multi_cable_connections
+        return topology_dict, device_roles, multi_cable_connections, list(site_device_tags)
     nb_devices = Device.objects.filter(site_id=site_id)
     if not nb_devices:
-        return topology_dict, device_roles, multi_cable_connections
+        return topology_dict, device_roles, multi_cable_connections, list(site_device_tags)
     links = []
     device_ids = [d.id for d in nb_devices]
     for nb_device in nb_devices:
@@ -200,6 +241,10 @@ def get_site_topology(site_id):
         primary_ip = ''
         if nb_device.primary_ip:
             primary_ip = str(nb_device.primary_ip.address)
+        tags = [str(tag) for tag in nb_device.tags.names()] or []
+        tags = filter_tags(tags)
+        for tag in tags:
+            site_device_tags.add((tag, not tag_is_hidden(tag)))
         links_from_device = Cable.objects.filter(_termination_a_device_id=nb_device.id)
         links_to_device = Cable.objects.filter(_termination_b_device_id=nb_device.id)
         if links_from_device:
@@ -230,6 +275,7 @@ def get_site_topology(site_id):
                 nb_device.id
             ),
             'isPassive': device_is_passive,
+            'tags': tags,
         })
         is_visible = not (nb_device.device_role.slug in UNDISPLAYED_DEVICE_ROLE_SLUGS)
         device_roles.add((nb_device.device_role.slug, nb_device.device_role.name, is_visible))
@@ -241,6 +287,8 @@ def get_site_topology(site_id):
                 links.append(link)
     device_roles = list(device_roles)
     device_roles.sort(key=lambda i: get_node_layer_sort_preference(i[0]))
+    site_device_tags = list(site_device_tags)
+    site_device_tags.sort()
     if not links:
         return topology_dict, device_roles, multi_cable_connections
     link_ids = set()
@@ -272,7 +320,7 @@ def get_site_topology(site_id):
             "tgtIfName": if_shortname(cable_path[-1][2].name),
             "isLogicalMultiCable": True,
         })
-    return topology_dict, device_roles, multi_cable_connections
+    return topology_dict, device_roles, multi_cable_connections, site_device_tags
 
 
 class TopologyView(PermissionRequiredMixin, View):
@@ -280,13 +328,15 @@ class TopologyView(PermissionRequiredMixin, View):
     permission_required = ('dcim.view_site', 'dcim.view_device', 'dcim.view_cable')
 
     def get(self, request, site_id):
-        topology_dict, device_roles, multi_cable_connections = get_site_topology(site_id)
+        topology_dict, device_roles, multi_cable_connections, device_tags = get_site_topology(site_id)
 
         return render(request, 'nextbox_ui_plugin/site_topology.html', {
             'source_data': json.dumps(topology_dict),
             'display_unconnected': DISPLAY_UNCONNECTED,
             'device_roles': device_roles,
+            'device_tags': device_tags,
             'undisplayed_roles': list(UNDISPLAYED_DEVICE_ROLE_SLUGS),
+            'undisplayed_device_tags': list(UNDISPLAYED_DEVICE_TAGS),
             'display_logical_multicable_links': DISPLAY_LOGICAL_MULTICABLE_LINKS,
             'display_passive_devices': DISPLAY_PASSIVE_DEVICES,
             'initial_layout': INITIAL_LAYOUT,

@@ -298,6 +298,20 @@
         });
     };
 
+    showHideDevicesByTag = function(deviceTag, isVisible) {
+        topologyData['nodes'].forEach(function(node){
+            if (node['tags'].length < 1) {
+                return;
+            };
+            node['tags'].forEach(function(tag){
+                if (tag == deviceTag) {
+                    topo.graph().getVertex(node['id']).visible(isVisible);
+                    return;
+                };
+            });
+        });
+    };
+
     showHideLogicalMultiCableLinks = function() {
         topologyData['links'].forEach(function(link){
             if (link['isLogicalMultiCable']) {
@@ -327,6 +341,9 @@
         showHideLogicalMultiCableLinks();
         undisplayedRoles.forEach(function(deviceRole){
             showHideDeviceRoles(deviceRole, false);
+        });
+        undisplayedDeviceTags.forEach(function(deviceTag){
+            showHideDevicesByTag(deviceTag, false);
         });
     });
 

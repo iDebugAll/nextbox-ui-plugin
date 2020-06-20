@@ -20,6 +20,10 @@ function layerSelectorOnChange(checkbox){
     showHideDeviceRoles(checkbox.value, checkbox.checked);
 };
 
+function layerSelectorByTagOnChange(checkbox){
+    showHideDevicesByTag(checkbox.value, checkbox.checked)
+};
+
 function showHidePassiveDevicesButtonInitial() {
     showHidePassiveDevicesButton = document.getElementById("showHidePassiveDevicesButton");
     if (displayPassiveDevices == false) {
