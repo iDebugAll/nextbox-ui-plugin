@@ -60,6 +60,24 @@ Optionally, update a PLUGINS_CONFIG parameter in **configuration.py** to rewrite
 #            Listed device role slugs are hidden on initial view load,
 #            you may then hide/display any layer with a control button.
 #        ),
+#        'undisplayed_device_tags': (
+#           ADD YOUR SETTINGS HERE
+#           undisplayed_device_tags value is a list or a tuple of regex strings.
+#           Devices with tags matching any of listed regular expressions are hidden
+#           on initial view load, you may then hide/display any layer with a control button.
+#        ),
+#        'select_layers_list_include_device_tags': (
+#           ADD YOUR SETTINGS HERE
+#           select_layers_list_include_device_tags value is a list or a tuple of regex strings.
+#           Use this parameter to control tags listed in Select Layers menu.
+#           If specified, it works as allow list.
+#        ),
+#        'select_layers_list_exclude_device_tags': (
+#           ADD YOUR SETTINGS HERE
+#           select_layers_list_exclude_device_tags value is a list or a tuple of regex strings.
+#           Use this parameter to control tags listed in Select Layers menu.
+#           If specified, it filters out matched tags from the list, except ones mathcing 'undisplayed_device_tags'.
+#        ),
 #        'DISPLAY_PASSIVE_DEVICES': True|False,
 #        'DISPLAY_LOGICAL_MULTICABLE_LINKS': True|False,
 #        'DISPLAY_UNCONNECTED': True|False,
@@ -166,9 +184,13 @@ Default mapping already contains some general categories:
 <br/><br/>
 
 The Plugin can control the visibility of the layers and/or specific nodes on the topology view.<br/>
-The visibility control is currently implemented for specific device roles, unconnected devices, and passive devices:<br/>
+The visibility control is currently implemented for specific device roles, device tags, unconnected devices, and passive devices:<br/>
 
   - Inifial visibility behavior for specific device roles is controlled by 'undisplayed_device_role_slugs' plugin parameter. Listed device role slugs are hidden on initial view load, you may then hide/display any layer with a control button on the topology view page.<br/>
+
+  - Inifial visibility behavior for specific device tags is controlled by 'undisplayed_device_tags' plugin parameter. Devices with tags matching listed tag resular expressions are hidden on initial view load, you may then hide/display any layer with a control button on the topology view page.<br/>
+  By default, the plugin lists all discovered device tags in Select Layers menu. You can use 'select_layers_list_include_device_tags' and 'select_layers_list_exclude_device_tags' plugin parameters to filter the included tags.<br/>
+  All three tag visibility control parameters are optional lists of regular expressions. Tags matching 'undisplayed_device_tags' are always listed in Select Layers menu. Empty or unset 'select_layers_list_include_device_tags' allows all discovered tags to be listed in Select layers menu. If set, 'select_layers_list_include_device_tags' works as an allow list for matched tags. 'select_layers_list_exclude_device_tags' filters out matched tags from the list, expept for ones matching 'undisplayed_device_tags'.
 
   - Initial visibility behavior for unconnected nodes is controlled by DISPLAY_UNCONNECTED boolean plugin parameter.<br/>
   By default unconnected nodes are being displayed. Set DISPLAY_UNCONNECTED to False to hide them on initial topology view load.<br/>
