@@ -200,7 +200,7 @@ The visibility control is currently implemented for specific device roles, devic
   Actual multi-cable connections between the end-devices a replaced by the direct logical connection once the passive devices are hidden. This logical direct link may be displayed regardless of the passive devices visibility in addition to the cabling across patch pannels if you set DISPLAY_LOGICAL_MULTICABLE_LINKS plugin paramenter to True. DISPLAY_LOGICAL_MULTICABLE_LINKS is set to False by default. This parameter only affects the initical logical link visibility. With hidden passive devices, it is always being displayed.<br/>
 <br/>
 
-Device role based layers are ordered vertically by default. You can control this behavior with INITIAL_LAYOUT plugin parameter. Valid options are 'vertical', 'horizontal', and 'auto'.<br/>
+Device layers are ordered automatically by default. You can control this behavior with INITIAL_LAYOUT plugin parameter. Valid options are 'vertical', 'horizontal', and 'auto'.<br/>
 'auto' layout relies on NeXt UI dataprocessor best-effort algorithms. It spreads the Nodes across the view so they would be as distant from each other as possible. You may use it if the vertical and horizontal initial layout does not work properly in your browser (this is the issue to be fixed).
 
 

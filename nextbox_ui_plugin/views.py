@@ -142,7 +142,7 @@ SELECT_LAYERS_LIST_EXCLUDE_DEVICE_TAGS = PLUGIN_SETTINGS.get("select_layers_list
 # Defines the initial layer alignment direction on the view
 INITIAL_LAYOUT = PLUGIN_SETTINGS.get("INITIAL_LAYOUT", 'vertical')
 if INITIAL_LAYOUT not in ('vertical', 'horizontal', 'auto'):
-    INITIAL_LAYOUT = 'vertical'
+    INITIAL_LAYOUT = 'auto'
 
 
 def if_shortname(ifname):
