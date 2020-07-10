@@ -290,7 +290,7 @@ def get_site_topology(site_id):
     site_device_tags = list(site_device_tags)
     site_device_tags.sort()
     if not links:
-        return topology_dict, device_roles, multi_cable_connections
+        return topology_dict, device_roles, multi_cable_connections, list(site_device_tags)
     link_ids = set()
     for link in links:
         link_ids.add(link.id)
