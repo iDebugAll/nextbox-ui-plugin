@@ -140,7 +140,7 @@ SELECT_LAYERS_LIST_INCLUDE_DEVICE_TAGS = PLUGIN_SETTINGS.get("select_layers_list
 SELECT_LAYERS_LIST_EXCLUDE_DEVICE_TAGS = PLUGIN_SETTINGS.get("select_layers_list_exclude_device_tags", tuple())
 
 # Defines the initial layer alignment direction on the view
-INITIAL_LAYOUT = PLUGIN_SETTINGS.get("INITIAL_LAYOUT", 'vertical')
+INITIAL_LAYOUT = PLUGIN_SETTINGS.get("INITIAL_LAYOUT", 'auto')
 if INITIAL_LAYOUT not in ('vertical', 'horizontal', 'auto'):
     INITIAL_LAYOUT = 'auto'
 
