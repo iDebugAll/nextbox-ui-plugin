@@ -301,7 +301,10 @@ def get_site_topology(site_id):
             "srcIfName": if_shortname(link.termination_a.name),
             "tgtIfName": if_shortname(link.termination_b.name)
         })
-        cable_path, endpoint = link.termination_a.trace()
+        trace_result = link.termination_a.trace()
+        if not trace_result:
+            continue
+        cable_path, *ignore = trace_result
         # identify segmented cable paths between end-devices
         if len(cable_path) < 2:
             continue
