@@ -319,7 +319,7 @@ def get_site_topology(site_id):
             'id': link_id,
             'source': cable_path[0][0].device.id,
             'target': cable_path[-1][2].device.id,
-            "srcIfName": if_shortname(cable_path[-1][2].name),
+            "srcIfName": if_shortname(cable_path[0][0].name),
             "tgtIfName": if_shortname(cable_path[-1][2].name),
             "isLogicalMultiCable": True,
         })
