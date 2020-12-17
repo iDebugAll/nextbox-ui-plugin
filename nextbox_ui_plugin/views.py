@@ -303,11 +303,15 @@ def get_site_topology(site_id):
             "srcIfName": if_shortname(link.termination_a.name),
             "tgtIfName": if_shortname(link.termination_b.name)
         })
-        if NETBOX_CURRENT_VERSION >= version.parse("2.10.1"):
-            # Version 2.10.1 introduces some changes in cable trace behavior.
-            if not isinstance(link.termination_a, Interface):
-                continue
-        trace_result = link.termination_a.trace()
+        if not (isinstance(link.termination_a, Interface) or isinstance(link.termination_b, Interface)):
+            # Skip trace if none of cable terminations is an Interface
+            continue
+        interface_side = None
+        if isinstance(link.termination_a, Interface):
+            interface_side = link.termination_a
+        elif isinstance(link.termination_b, Interface):
+            interface_side = link.termination_b
+        trace_result = interface_side.trace()
         if not trace_result:
             continue
         if NETBOX_CURRENT_VERSION >= version.parse("2.10.1"):
