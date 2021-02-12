@@ -12,7 +12,7 @@
 
 <h2>Topology Viewer</h2>
 
-<div class="col-md-3 pull-right right-side-panel noprint">
+<div class="col-md-3 pull-right right-side-panel noprint" style="z-index: 2;">
     {% include 'inc/search_panel.html' %}
     {% block sidebar %}{% endblock %}
 </div>
@@ -54,10 +54,12 @@
         </div>
     </div>
 </div>
-<div class="row noprint">
-    <div class="pull-left noprint">
-        <div id="nx-ui-topology" class="container">
+<div class="row noprint" style="z-index: 1;">
+    <div class="col-lg-3" style="z-index: 1;">
+        <div class="pull-left noprint">
+            <div id="nx-ui-topology" class="container">
 
+            </div>
         </div>
     </div>
 </div>
