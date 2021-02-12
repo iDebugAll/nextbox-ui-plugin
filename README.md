@@ -245,17 +245,21 @@ Netbox Community Docker setup performs static file collection on every startup. 
 
 # Usage
 
-Once installed and initialized, the Plugin runs on a backend. It currently supports topology visualization for Netbox Sites.<br/>
+Once installed and initialized, the Plugin runs on a backend.<br/>
+The Plugin supports a topology visualization of arbitrary sets of Sites and Regions.<br/>
 <br/>
-Site topology visualization may be accessed in two different ways:
+You can access Topology visualizations in different ways:
 1. By clicking a custom plugin Topology button on a Site page.
 ![](samples/sample_topology_button.png)
-The topology visualization will open in a pop-up window:
+The Site topology visualization will open in a pop-up window:
 ![](samples/sample_topology_view.png)<br/>
 Nodes are draggable and clickable:
 ![](samples/sample_node_tooltip_content.png)<br/>
 You can switch between vertical and horizontal layers sort order back and forth. Default is vertical.<br/>
-2. Directly via /plugins/nextbox-ui/site_topology/{site_id}. This is helpful in case if you need an embedded topology frame on some of your side resources.
+
+2. Using Plugins dropdown menu item: *Plugins -> NextBox UI -> Topology Viewer*.<br/>
+Use Search form controls to pick desired Sites, Regions, or Devices.<br/>
+![](samples/sample_topology_viewer_page01.png)
 <br/>
 
 ### Visibility control
