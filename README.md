@@ -186,18 +186,18 @@ Default mapping already contains some general categories:
 The Plugin can control the visibility of the layers and/or specific nodes on the topology view.<br/>
 The visibility control is currently implemented for specific device roles, device tags, unconnected devices, and passive devices:<br/>
 
-  - Inifial visibility behavior for specific device roles is controlled by 'undisplayed_device_role_slugs' plugin parameter. Listed device role slugs are hidden on initial view load, you may then hide/display any layer with a control button on the topology view page.<br/>
+  - Initial visibility behavior for specific device roles is controlled by 'undisplayed_device_role_slugs' plugin parameter. Listed device role slugs are hidden on initial view load, you may then hide/display any layer with a control button on the topology view page.<br/>
 
-  - Inifial visibility behavior for specific device tags is controlled by 'undisplayed_device_tags' plugin parameter. Devices with tags matching listed tag resular expressions are hidden on initial view load, you may then hide/display any layer with a control button on the topology view page.<br/>
+  - Initial visibility behavior for specific device tags is controlled by 'undisplayed_device_tags' plugin parameter. Devices with tags matching listed tag regular expressions are hidden on initial view load, you may then hide/display any layer with a control button on the topology view page.<br/>
   By default, the plugin lists all discovered device tags in Select Layers menu. You can use 'select_layers_list_include_device_tags' and 'select_layers_list_exclude_device_tags' plugin parameters to filter the included tags.<br/>
-  All three tag visibility control parameters are optional lists of regular expressions. Tags matching 'undisplayed_device_tags' are always listed in Select Layers menu. Empty or unset 'select_layers_list_include_device_tags' allows all discovered tags to be listed in Select layers menu. If set, 'select_layers_list_include_device_tags' works as an allow list for matched tags. 'select_layers_list_exclude_device_tags' filters out matched tags from the list, expept for ones matching 'undisplayed_device_tags'.
+  All three tag visibility control parameters are optional lists of regular expressions. Tags matching 'undisplayed_device_tags' are always listed in Select Layers menu. Empty or unset 'select_layers_list_include_device_tags' allows all discovered tags to be listed in Select layers menu. If set, 'select_layers_list_include_device_tags' works as an allow list for matched tags. 'select_layers_list_exclude_device_tags' filters out matched tags from the list, excpept for ones matching 'undisplayed_device_tags'.
 
   - Initial visibility behavior for unconnected nodes is controlled by DISPLAY_UNCONNECTED boolean plugin parameter.<br/>
-  By default unconnected nodes are being displayed. Set DISPLAY_UNCONNECTED to False to hide them on initial topology view load.<br/>
+  By default, unconnected nodes are being displayed. Set DISPLAY_UNCONNECTED to False to hide them on initial topology view load.<br/>
   A separate 'Hide/Display Unconnected' button may then be used to hide or display those nodes.
 
-  - Initical visibility for passive devices (patch pannels, PDUs) is controlled by DISPLAY_PASSIVE_DEVICES boolean plugin parameter. A device is considered passive if it has cables connected to Front and Rear Ports only and not to Interfaces.<br/>Passive devices are hidden by default. You can display them with 'Display Passive Devices' button on the topology view page. <br/>
-  Actual multi-cable connections between the end-devices a replaced by the direct logical connection once the passive devices are hidden. This logical direct link may be displayed regardless of the passive devices visibility in addition to the cabling across patch pannels if you set DISPLAY_LOGICAL_MULTICABLE_LINKS plugin paramenter to True. DISPLAY_LOGICAL_MULTICABLE_LINKS is set to False by default. This parameter only affects the initical logical link visibility. With hidden passive devices, it is always being displayed.<br/>
+  - Initial visibility for passive devices (patch panels, PDUs) is controlled by DISPLAY_PASSIVE_DEVICES boolean plugin parameter. A device is considered passive if it has cables connected to Front and Rear Ports only and not to Interfaces.<br/>Passive devices are hidden by default. You can display them with 'Display Passive Devices' button on the topology view page. <br/>
+  Actual multi-cable connections between the end-devices a replaced by the direct logical connection once the passive devices are hidden. This logical direct link may be displayed regardless of the passive device visibility in addition to the cabling across patch panels if you set DISPLAY_LOGICAL_MULTICABLE_LINKS plugin parameter to True. DISPLAY_LOGICAL_MULTICABLE_LINKS is set to False by default. This parameter only affects the initial logical link visibility. With hidden passive devices, it is always being displayed.<br/>
 <br/>
 
 Device layers are ordered automatically by default. You can control this behavior with INITIAL_LAYOUT plugin parameter. Valid options are 'vertical', 'horizontal', and 'auto'.<br/>
@@ -221,7 +221,7 @@ sudo systemctl restart netbox
 # Installation with Docker
 The Plugin may be installed in a Netbox Docker deployment. 
 The package contains a Dockerfile for [Netbox-Community Docker](https://github.com/netbox-community/netbox-docker) extension. Latest-LDAP version is used by default as a source.<br/>
-Download the Plugin and build from source:
+Download the Plugin and build from the source:
 ```
 $ git clone https://github.com/iDebugAll/nextbox-ui-plugin
 $ cd nextbox-ui-plugin
@@ -241,21 +241,25 @@ $ cd netbox-docker
 $ docker-compose down
 $ docker-compose up -d
 ```
-Netbox Community Docker setup performs static files collection on every startup. No manual actions required.
+Netbox Community Docker setup performs static file collection on every startup. No manual actions are required.
 
 # Usage
 
-Once installed and initialized, the Plugin runs on a backend. It currently supports topology visualization for Netbox Sites.<br/>
+Once installed and initialized, the Plugin runs on a backend.<br/>
+The Plugin supports a topology visualization of arbitrary sets of Sites and Regions.<br/>
 <br/>
-Site topology visualization may be accessed in two different ways:
+You can access Topology visualizations in different ways:
 1. By clicking a custom plugin Topology button on a Site page.
 ![](samples/sample_topology_button.png)
-The topology visualization will open in a pop-up window:
+The Site topology visualization will open in a pop-up window:
 ![](samples/sample_topology_view.png)<br/>
 Nodes are draggable and clickable:
 ![](samples/sample_node_tooltip_content.png)<br/>
 You can switch between vertical and horizontal layers sort order back and forth. Default is vertical.<br/>
-2. Directly via /plugins/nextbox-ui/site_topology/{site_id}. This is helpful in case if you need an embedded topology frame on some of your side resources.
+
+2. Using Plugins dropdown menu item: *Plugins -> NextBox UI -> Topology Viewer*.<br/>
+Use Search form controls to pick desired Sites, Regions, or Devices.<br/>
+![](samples/sample_topology_viewer_page01.png)
 <br/>
 
 ### Visibility control
@@ -276,7 +280,7 @@ If DISPLAY_LOGICAL_MULTICABLE_LINKS is set to True (default is False) this logic
 ![](samples/sample_display_logical_link.png)
 
 ### Required Netbox User Permissions
-The Plugin requires the following user permissions in order to access topology view:
+The Plugin requires the following user permissions to access the topology view:
 
   - dcim | site   | Can read site
   - dcim | device | Can view device

@@ -3,6 +3,7 @@
 from django.shortcuts import render
 from django.views.generic import View
 from dcim.models import Cable, Device, Interface
+from . import forms, filters
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.conf import settings
 from packaging import version
@@ -226,19 +227,16 @@ def filter_tags(tags):
     return tags
 
 
-def get_site_topology(site_id):
+def get_topology(nb_devices_qs):
     topology_dict = {'nodes': [], 'links': []}
     device_roles = set()
-    site_device_tags = set()
+    all_device_tags = set()
     multi_cable_connections = []
-    if not site_id:
-        return topology_dict, device_roles, multi_cable_connections, list(site_device_tags)
-    nb_devices = Device.objects.filter(site_id=site_id)
-    if not nb_devices:
-        return topology_dict, device_roles, multi_cable_connections, list(site_device_tags)
+    if not nb_devices_qs:
+        return topology_dict, device_roles, multi_cable_connections, list(all_device_tags)
     links = []
-    device_ids = [d.id for d in nb_devices]
-    for nb_device in nb_devices:
+    device_ids = [d.id for d in nb_devices_qs]
+    for nb_device in nb_devices_qs:
         device_is_passive = False
         primary_ip = ''
         if nb_device.primary_ip:
@@ -246,7 +244,7 @@ def get_site_topology(site_id):
         tags = [str(tag) for tag in nb_device.tags.names()] or []
         tags = filter_tags(tags)
         for tag in tags:
-            site_device_tags.add((tag, not tag_is_hidden(tag)))
+            all_device_tags.add((tag, not tag_is_hidden(tag)))
         links_from_device = Cable.objects.filter(_termination_a_device_id=nb_device.id)
         links_to_device = Cable.objects.filter(_termination_b_device_id=nb_device.id)
         if links_from_device:
@@ -284,15 +282,15 @@ def get_site_topology(site_id):
         if not links_from_device:
             continue
         for link in links_from_device:
-            # Include links to devices from the same Site only
+            # Include links to discovered devices only
             if link._termination_b_device_id in device_ids:
                 links.append(link)
     device_roles = list(device_roles)
     device_roles.sort(key=lambda i: get_node_layer_sort_preference(i[0]))
-    site_device_tags = list(site_device_tags)
-    site_device_tags.sort()
+    all_device_tags = list(all_device_tags)
+    all_device_tags.sort()
     if not links:
-        return topology_dict, device_roles, multi_cable_connections, list(site_device_tags)
+        return topology_dict, device_roles, multi_cable_connections, list(all_device_tags)
     link_ids = set()
     for link in links:
         link_ids.add(link.id)
@@ -337,17 +335,25 @@ def get_site_topology(site_id):
             "tgtIfName": if_shortname(cable_path[-1][2].name),
             "isLogicalMultiCable": True,
         })
-    return topology_dict, device_roles, multi_cable_connections, site_device_tags
+    return topology_dict, device_roles, multi_cable_connections, all_device_tags
 
 
 class TopologyView(PermissionRequiredMixin, View):
-    """Site Topology View"""
+    """Generic Topology View"""
     permission_required = ('dcim.view_site', 'dcim.view_device', 'dcim.view_cable')
+    queryset = Device.objects.all()
+    filterset = filters.TopologyFilterSet
+    template_name = 'nextbox_ui_plugin/topology.html'
 
-    def get(self, request, site_id):
-        topology_dict, device_roles, multi_cable_connections, device_tags = get_site_topology(site_id)
+    def get(self, request):
 
-        return render(request, 'nextbox_ui_plugin/site_topology.html', {
+        if not request.GET:
+            self.queryset = Device.objects.none()
+
+        self.queryset = self.filterset(request.GET, self.queryset).qs
+        topology_dict, device_roles, multi_cable_connections, device_tags = get_topology(self.queryset)
+
+        return render(request, self.template_name, {
             'source_data': json.dumps(topology_dict),
             'display_unconnected': DISPLAY_UNCONNECTED,
             'device_roles': device_roles,
@@ -357,4 +363,9 @@ class TopologyView(PermissionRequiredMixin, View):
             'display_logical_multicable_links': DISPLAY_LOGICAL_MULTICABLE_LINKS,
             'display_passive_devices': DISPLAY_PASSIVE_DEVICES,
             'initial_layout': INITIAL_LAYOUT,
+            'filter_form': forms.TopologyFilterForm(request.GET, label_suffix='')
         })
+
+
+class SiteTopologyView(TopologyView):
+    template_name = 'nextbox_ui_plugin/site_topology.html'

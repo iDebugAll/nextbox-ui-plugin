@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% load buttons %}
+{% load static %}
+
+{% block header %}
+<script src="{% static 'nextbox_ui_plugin/next_sources/js/next.js' %}"></script>
+<link rel="stylesheet"href="{% static 'nextbox_ui_plugin/next_sources/css/next.css' %}">
+<script src="{% static 'nextbox_ui_plugin/button_utils.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+
+<h2>Topology Viewer</h2>
+
+<div class="col-md-3 pull-right right-side-panel noprint" style="z-index: 2;">
+    {% include 'inc/search_panel.html' %}
+    {% block sidebar %}{% endblock %}
+</div>
+<div>
+    <div class="btn-group">
+        <button class="btn btn-primary " onclick='horizontal()'>Horizontal Layout</button>
+        <button class="btn btn-primary" onclick="vertical()">Vertical Layout</button>
+    </div>
+    <input class="btn btn-primary" type="button" id="showHideUndonnectedButton" value="" onclick="return showHideUndonnectedButtonOnClick(this);" />
+    <input class="btn btn-primary" type="button" id="showHidePassiveDevicesButton" value="" onclick="return showHidePassiveDevicesButtonOnClick(this);" />
+    <div class="btn-group">
+        <div class="dropdown">
+            <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Select Layers
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <h6 class="dropdown-header">Device Roles</h6>
+                <div class="dropdown-divider"></div>
+                {% for device_role_slug, device_role_name, is_visible in device_roles %}
+                    <div class="checkbox ml-1 my-1">
+                        <label>
+                            <input onchange="layerSelectorOnChange(this)" type="checkbox" value="{{ device_role_slug }}" {{ is_visible|yesno:"checked," }}>{{ device_role_name }}
+                        </label>
+                    </div>
+                {% endfor %}
+                <div class="dropdown-divider"></div>
+                {% if device_tags %}
+                    <h6 class="dropdown-header">Device Tags</h6>
+                    {% for tag, is_visible in device_tags %}
+                        <div class="checkbox ml-1 my-1">
+                            <label>
+                                <input onchange="layerSelectorByTagOnChange(this)" type="checkbox" value="{{ tag }}" {{ is_visible|yesno:"checked," }}>{{ tag }}
+                            </label>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                <div class="dropdown-divider"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row noprint" style="z-index: 1;">
+    <div class="col-lg-3" style="z-index: 1;">
+        <div class="pull-left noprint">
+            <div id="nx-ui-topology" class="container">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block javascript %}
+
+
+<script type="text/javascript">
+    var displayUnconnected = {{ display_unconnected|yesno:"true,false" }};
+    var displayPassiveDevices = {{ display_passive_devices|yesno:"true,false" }};
+    var displayLogicalMultiCableLinks = {{ display_logical_multicable_links|yesno:"true,false" }};
+    var undisplayedRoles = {{ undisplayed_roles|safe }};
+    var undisplayedDeviceTags = {{ undisplayed_device_tags|safe }};
+    var topologyData = {{ source_data|safe }};
+    var initialLayout = '{{ initial_layout|safe }}';
+    console.log(topologyData);
+</script>
+<script src="{% static 'nextbox_ui_plugin/next_app.js' %}"></script>
+
+<script type="text/javascript">
+    showHideUndonnectedButtonInitial();
+    showHidePassiveDevicesButtonInitial();
+</script>
+
+{% endblock %}
+
+
+
