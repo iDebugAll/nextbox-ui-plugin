@@ -12,7 +12,7 @@
         <script src="{% static 'nextbox_ui_plugin/button_utils.js' %}"></script>
     </head>
     <body>
-        <div class="container-sm ml-4 my-sm-3">
+        <div class="container-sm ml-4 my-sm-3" id="nx-ui-topology">
             <div class="row">
               <div class="col-xs-4">
                 <div class="btn-group">
@@ -58,6 +58,7 @@
               </div>
             </div>
         </div>
+        
         <script type="text/javascript">
             var displayUnconnected = {{ display_unconnected|yesno:"true,false" }};
             var displayPassiveDevices = {{ display_passive_devices|yesno:"true,false" }};

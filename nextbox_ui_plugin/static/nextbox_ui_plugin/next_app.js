@@ -2,11 +2,24 @@
     /**
      * NeXt UI base application
      */
+
+    // Calculate topology canvas size
+    // based on window size during page loading.
+    // Canvas size can only be set once during page init. 
+    // It does not autoscale. Page reload is required to update topology dimensions.
+    if (document.body.clientWidth && document.body.clientHeight) {
+        var canvasWidth = document.body.clientWidth*0.75;
+        var canvasHeight = document.body.clientHeight*0.75;
+    } else {
+        var canvasWidth = 850;
+        var canvasHeight = 750;
+    };
+
     // Initialize topology
     var topo = new nx.graphic.Topology({
         // View dimensions
-        width: 850,
-        height: 700,
+        width: canvasWidth,
+        height: canvasHeight,
         // Dataprocessor is responsible for spreading 
         // the Nodes across the view.
         // 'force' dataprocessor spreads the Nodes so
@@ -67,6 +80,9 @@
     
     var Shell = nx.define(nx.ui.Application, {
         methods: {
+            getContainer: function() {
+                return new nx.dom.Element(document.getElementById('nx-ui-topology'));
+            },
             start: function () {
                 // Read topology data from variable
                 topo.data(topologyData);
@@ -80,7 +96,6 @@
                     });
                     topo.activateLayout('hierarchicalLayout');
                 };
-                
                 // Attach it to the document
                 topo.attach(this);
             }
@@ -349,6 +364,9 @@
 
     // Create an application instance
     var shell = new Shell();
+    shell.on('resize', function() {
+        topo && topo.adaptToContainer();
+    });
     // Run the application
     shell.start();
 })(nx);
