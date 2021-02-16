@@ -115,7 +115,7 @@
                     content: [{
                         tag: 'a',
                         content: '{#node.model.name}',
-                        props: {"href": "{#node.model.dcimDeviceLink}"}
+                        props: {"href": "{#node.model.dcimDeviceLink}", "target": "_blank", "rel": "noopener noreferrer"}
                     }],
                     props: {
                         "style": "border-bottom: dotted 1px; font-size:90%; word-wrap:normal; color:#003688"
