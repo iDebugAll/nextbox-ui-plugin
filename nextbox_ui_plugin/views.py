@@ -238,6 +238,7 @@ def get_topology(nb_devices_qs):
     device_ids = [d.id for d in nb_devices_qs]
     for nb_device in nb_devices_qs:
         device_is_passive = False
+        device_url = nb_device.get_absolute_url()
         primary_ip = ''
         if nb_device.primary_ip:
             primary_ip = str(nb_device.primary_ip.address)
@@ -264,6 +265,7 @@ def get_topology(nb_devices_qs):
         topology_dict['nodes'].append({
             'id': nb_device.id,
             'name': nb_device.name,
+            'dcimDeviceLink': device_url,
             'primaryIP': primary_ip,
             'serial_number': nb_device.serial,
             'model': nb_device.device_type.model,
