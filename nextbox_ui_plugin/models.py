@@ -4,8 +4,10 @@ from utilities.querysets import RestrictedQuerySet
 
 class SavedTopology(models.Model):
 
+    name = models.CharField(max_length=100, blank=True)
     topology = models.JSONField()
-    user = models.ForeignKey(
+    layout_context = models.JSONField(null=True, blank=True)
+    created_by = models.ForeignKey(
         to="users.AdminUser",
         on_delete=models.CASCADE,
         blank=False,
@@ -16,4 +18,4 @@ class SavedTopology(models.Model):
     objects = RestrictedQuerySet.as_manager()
 
     def __str__(self):
-        return str(self.timestamp)
+        return str(self.name)

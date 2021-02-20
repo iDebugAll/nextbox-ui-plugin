@@ -4,4 +4,4 @@ from .models import SavedTopology
 
 @admin.register(SavedTopology)
 class SavedTopologyAdmin(admin.ModelAdmin):
-    list_display = ("user", "timestamp", "topology",)
+    list_display = ("name", "created_by", "timestamp", "topology",)

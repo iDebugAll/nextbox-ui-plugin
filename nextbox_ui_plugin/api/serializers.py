@@ -1,16 +1,20 @@
 from rest_framework import serializers
-from rest_framework.fields import CurrentUserDefault
 from nextbox_ui_plugin.models import SavedTopology
-from users.api.nested_serializers import NestedUserSerializer
 import datetime
 import json
 
+
 class SavedTopologySerializer(serializers.ModelSerializer):
+
+    created_by = serializers.CharField(read_only=True)
+    timestamp = serializers.DateTimeField(read_only=True)
 
     def to_internal_value(self, data):
         validated = {
+            'name': str(data.get('name').strip() or f"{self.context['request'].user} - {datetime.datetime.now()}"),
             'topology': json.loads(data.get('topology')),
-            'user': self.context['request'].user,
+            'layout_context': json.loads(data.get('layout_context')),
+            'created_by': self.context['request'].user,
             'timestamp': str(datetime.datetime.now())
         }
         return validated
@@ -18,5 +22,5 @@ class SavedTopologySerializer(serializers.ModelSerializer):
     class Meta:
         model = SavedTopology
         fields = [
-            "id", "topology", "user", "timestamp"
+            "id", "name", "topology", "layout_context", "created_by", "timestamp",
         ]

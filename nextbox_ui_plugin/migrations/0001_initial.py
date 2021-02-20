@@ -15,9 +15,11 @@ class Migration(migrations.Migration):
             name='SavedTopology',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False)),
+                ('name', models.CharField(blank=True, max_length=100)),
                 ('topology', models.JSONField()),
+                ('layout_context', models.JSONField(blank=True, null=True)),
                 ('timestamp', models.DateTimeField()),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='users.adminuser')),
+                ('created_by', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='users.adminuser')),
             ],
         ),
     ]
