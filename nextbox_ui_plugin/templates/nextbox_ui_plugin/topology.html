@@ -15,6 +15,30 @@
 <div class="col-md-3 pull-right right-side-panel noprint" style="z-index: 2;">
     {% include 'inc/search_panel.html' %}
     {% block sidebar %}{% endblock %}
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <span class="mdi mdi-magnify" aria-hidden="true"></span>
+            <strong>Load Saved View</strong>
+        </div>
+        <div class="panel-body">
+            <form action="." method="get" class="form">
+                {% for field in load_saved_filter_form.visible_fields %}
+                    <div class="form-group">
+                            {{ field.label_tag }}
+                            {{ field }}
+                    </div>
+                {% endfor %}
+                <div class="text-right noprint">
+                    <button type="submit" class="btn btn-primary">
+                        <span class="mdi mdi-application-import" aria-hidden="true"></span> Apply
+                    </button>
+                    <a href="." class="btn btn-default">
+                        <span class="mdi mdi-close-thick" aria-hidden="true"></span> Clear
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 <div>
     <div class="btn-group">
@@ -53,6 +77,23 @@
             </div>
         </div>
     </div>
+    <div class="btn-group">
+        <div class="dropdown">
+            <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Save Current View
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <h6 class="dropdown-header">Saved View Name:</h6>
+                <div style="margin-bottom: 5px; margin-left: 2px; margin-right: 2px;">
+                    <input type="text" id="topoSaveName" name="topoSaveName"></input>
+                </div>
+                <div style="margin-left: 2px; margin-right: 2px;">
+                    <label class="control-label col-sm-6 pull-left" for="saveTopologyView" id="saveResult" style="margin-top: 7px; margin-left:4px;"></label>
+                    <input class="btn btn-primary pull-right" type="button" id="saveTopologyView" value="Submit" onclick="return saveView(topoSaveURI, netbox_csrf_token);" />
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 <div class="row noprint" style="z-index: 1;">
     <div class="col-lg-3" style="z-index: 1;">
@@ -77,7 +118,10 @@
     var undisplayedRoles = {{ undisplayed_roles|safe }};
     var undisplayedDeviceTags = {{ undisplayed_device_tags|safe }};
     var topologyData = {{ source_data|safe }};
+    var topologySavedData = {{ source_data|safe }};
     var initialLayout = '{{ initial_layout|safe }}';
+    var requestGET = {{ requestGET|safe }};
+    var topoSaveURI = '{% url 'plugins-api:nextbox_ui_plugin-api:savedtopology-list' %}';
     console.log(topologyData);
 </script>
 <script src="{% static 'nextbox_ui_plugin/next_app.js' %}"></script>

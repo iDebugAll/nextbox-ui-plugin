@@ -347,6 +347,41 @@
         displayPassiveDevices = !displayPassiveDevices
     };
 
+    saveView = function (topoSaveURI, CSRFToken) {
+        var topoSaveName = document.getElementById('topoSaveName').value.trim();
+        var saveButton = document.getElementById('saveTopologyView');
+        var saveResultLabel = document.getElementById('saveResult');
+        saveButton.setAttribute('disabled', true);
+        saveResultLabel.setAttribute('innerHTML', 'Processing');
+        $.ajax({
+            type: 'POST',
+            url: topoSaveURI,
+            data: {
+                'name': topoSaveName,
+                'topology': JSON.stringify(topo.data()),
+                'layout_context': JSON.stringify({
+                    'initialLayout': initialLayout,
+                    'displayUnconnected': !displayUnconnected,
+                    'undisplayedRoles': undisplayedRoles,
+                    'undisplayedDeviceTags': undisplayedDeviceTags,
+                    'displayPassiveDevices': !displayPassiveDevices,
+                    'displayLogicalMultiCableLinks': displayLogicalMultiCableLinks,
+                    'requestGET': requestGET,
+                })
+            },
+            headers: {'X-CSRFToken': CSRFToken},
+            success: function (response) {
+                saveResultLabel.innerHTML = 'Success';
+                saveButton.removeAttribute('disabled');
+                console.log(response);
+            },
+            error: function (response) {
+                saveResultLabel.innerHTML = 'Failed';
+                console.log(response);
+            }
+        })
+    };
+
     topo.on('topologyGenerated', function(){
         showHideUndonnected();
         showHidePassiveDevices();
@@ -359,6 +394,9 @@
         });
         undisplayedDeviceTags.forEach(function(deviceTag){
             showHideDevicesByTag(deviceTag, false);
+        });
+        topologySavedData['nodes'].forEach(function(node){
+            topo.graph().getVertex(node['id']).position({'x': node.x, 'y': node.y});
         });
     });
 

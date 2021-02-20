@@ -2,7 +2,8 @@
 
 from django.shortcuts import render
 from django.views.generic import View
-from dcim.models import Cable, Device, Interface
+from dcim.models import Cable, Device, Interface, DeviceRole
+from .models import SavedTopology
 from . import forms, filters
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.conf import settings
@@ -340,6 +341,40 @@ def get_topology(nb_devices_qs):
     return topology_dict, device_roles, multi_cable_connections, all_device_tags
 
 
+def get_saved_topology(id):
+    topology_dict = {}
+    device_roles = []
+    device_tags = []
+    device_roles_detailed = []
+    device_tags_detailed = []
+    layout_context = {}
+    topology_data = SavedTopology.objects.get(id=id)
+    if not topology_data:
+        return topology_dict, device_roles, device_tags, layout_context
+    topology_dict = dict(topology_data.topology)
+    if 'nodes' not in topology_dict:
+        return topology_dict, device_roles, device_tags, layout_context
+    device_roles = list(set([str(d.get('deviceRole')) for d in topology_dict['nodes'] if d.get('deviceRole')]))
+    for device_role in device_roles:
+        is_visible = not (device_role in UNDISPLAYED_DEVICE_ROLE_SLUGS)
+        device_role_obj = DeviceRole.objects.get(slug=device_role)
+        if not device_role_obj:
+            device_roles_detailed.append((device_role, device_role, is_visible))
+            continue
+        device_roles_detailed.append((device_role_obj.slug, device_role_obj.name, is_visible))
+    device_roles_detailed.sort(key=lambda i: get_node_layer_sort_preference(i[0]))
+    device_tags = set()
+    for device in topology_dict['nodes']:
+        if 'tags' not in device:
+            continue
+        for tag in device['tags']:
+            device_tags.add(str(tag))
+    device_tags = list(device_tags)
+    device_tags_detailed = list([(tag, not tag_is_hidden(tag)) for tag in device_tags])
+    layout_context = dict(topology_data.layout_context)
+    return topology_dict, device_roles_detailed, device_tags_detailed, layout_context
+
+
 class TopologyView(PermissionRequiredMixin, View):
     """Generic Topology View"""
     permission_required = ('dcim.view_site', 'dcim.view_device', 'dcim.view_cable')
@@ -351,21 +386,38 @@ class TopologyView(PermissionRequiredMixin, View):
 
         if not request.GET:
             self.queryset = Device.objects.none()
+        elif 'saved_topology_id' in request.GET:
+            self.queryset = Device.objects.none()
 
-        self.queryset = self.filterset(request.GET, self.queryset).qs
-        topology_dict, device_roles, multi_cable_connections, device_tags = get_topology(self.queryset)
+        saved_topology_id = request.GET.get('saved_topology_id')
+        layout_context = {}
+
+        if saved_topology_id is not None:
+            topology_dict, device_roles, device_tags, layout_context = get_saved_topology(saved_topology_id)
+        else:
+            self.queryset = self.filterset(request.GET, self.queryset).qs
+            topology_dict, device_roles, multi_cable_connections, device_tags = get_topology(self.queryset)
 
         return render(request, self.template_name, {
             'source_data': json.dumps(topology_dict),
-            'display_unconnected': DISPLAY_UNCONNECTED,
+            'display_unconnected': layout_context.get('displayUnconnected') or DISPLAY_UNCONNECTED,
             'device_roles': device_roles,
             'device_tags': device_tags,
             'undisplayed_roles': list(UNDISPLAYED_DEVICE_ROLE_SLUGS),
             'undisplayed_device_tags': list(UNDISPLAYED_DEVICE_TAGS),
             'display_logical_multicable_links': DISPLAY_LOGICAL_MULTICABLE_LINKS,
-            'display_passive_devices': DISPLAY_PASSIVE_DEVICES,
+            'display_passive_devices': layout_context.get('displayPassiveDevices') or DISPLAY_PASSIVE_DEVICES,
             'initial_layout': INITIAL_LAYOUT,
-            'filter_form': forms.TopologyFilterForm(request.GET, label_suffix='')
+            'filter_form': forms.TopologyFilterForm(
+                layout_context.get('requestGET') or request.GET,
+                label_suffix=''
+            ),
+            'load_saved_filter_form': forms.LoadSavedTopologyFilterForm(
+                request.GET,
+                label_suffix='',
+                user=request.user
+            ),
+            'requestGET': dict(request.GET),
         })
 
 
