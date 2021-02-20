@@ -23,6 +23,7 @@
     </div>
     <input class="btn btn-primary" type="button" id="showHideUndonnectedButton" value="" onclick="return showHideUndonnectedButtonOnClick(this);" />
     <input class="btn btn-primary" type="button" id="showHidePassiveDevicesButton" value="" onclick="return showHidePassiveDevicesButtonOnClick(this);" />
+    <input class="btn btn-primary" type="button" id="saveTopologyView" value="Save Current View" onclick="return saveView(topoSaveURI, netbox_csrf_token);" />
     <div class="btn-group">
         <div class="dropdown">
             <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -78,6 +79,7 @@
     var undisplayedDeviceTags = {{ undisplayed_device_tags|safe }};
     var topologyData = {{ source_data|safe }};
     var initialLayout = '{{ initial_layout|safe }}';
+    var topoSaveURI = '{% url 'plugins-api:nextbox_ui_plugin-api:savedtopology-list' %}';
     console.log(topologyData);
 </script>
 <script src="{% static 'nextbox_ui_plugin/next_app.js' %}"></script>

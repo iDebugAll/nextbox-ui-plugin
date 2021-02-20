@@ -347,6 +347,21 @@
         displayPassiveDevices = !displayPassiveDevices
     };
 
+    saveView = function (topoSaveURI, CSRFToken) {
+        $.ajax({
+            type: 'POST',
+            url: topoSaveURI,
+            data: {"topology": JSON.stringify(topo.data())},
+            headers: {"X-CSRFToken": CSRFToken},
+            success: function (response) {
+                console.log(response);
+            },
+            error: function (response) {
+                console.log(response)
+            }
+        })
+    };
+
     topo.on('topologyGenerated', function(){
         showHideUndonnected();
         showHidePassiveDevices();
