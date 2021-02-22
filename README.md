@@ -212,6 +212,15 @@ The Plugin contains static files for topology visualization. They should be serv
 (venv) $ python3 manage.py collectstatic
 ```
 
+### Apply Database Migrations
+
+> For plugin version 0.8.0 and above.
+
+Apply database migrations with Django `manage.py`:
+```
+(venv) $ python3 manage.py migrate
+```
+
 ### Restart Netbox
 Restart the WSGI service to apply changes:
 ```
@@ -241,7 +250,7 @@ $ cd netbox-docker
 $ docker-compose down
 $ docker-compose up -d
 ```
-Netbox Community Docker setup performs static file collection on every startup. No manual actions are required.
+Netbox Community Docker setup performs static file collection and database migrations on every startup. No manual actions are required.
 
 # Usage
 
