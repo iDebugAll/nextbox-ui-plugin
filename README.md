@@ -252,6 +252,14 @@ $ docker-compose up -d
 ```
 Netbox Community Docker setup performs static file collection and database migrations on every startup. No manual actions are required.
 
+# Fixing Common Installation and Post-Upgrade Issues
+
+If you are experiencing some unexpected errors or visual behaviors after the installation or upgrade, please make sure that you execute the following steps first:
+
+1. Clear your browser cache and reload the page.
+2. Re-collect static files: `(venv) $ python3 manage.py collectstatic --clear`.
+3. Re-apply database migrations: `(venv) $ python3 manage.py migrate`.
+
 # Usage
 
 Once installed and initialized, the Plugin runs on a backend.<br/>
