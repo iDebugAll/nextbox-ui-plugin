@@ -160,7 +160,7 @@ By default, the Plugin automatically tries to identify the device icon type base
 ```
 Keys are searched substrings. Values should be valid icon types as listed above.<br/>
 
-3. If no match found on steps 1-2, the Plugin checks the Device Role to Icon mapping.<br/>
+3. If no match found on steps 1-2, the Plugin checks the Device Role slug to Icon mapping.<br/>
 This mapping may be defined within 'icon_role_map' dict in Plugin parameters.<br/>
 Default mapping already contains some general categories:
 ```
