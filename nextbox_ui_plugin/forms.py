@@ -3,7 +3,7 @@ from utilities.forms import (
     BootstrapMixin, DynamicModelMultipleChoiceField,
 )
 from .models import SavedTopology
-from dcim.models import Device, Site, Region
+from dcim.models import Device, Location, Site, Region
 
 
 class TopologyFilterForm(BootstrapMixin, forms.Form):
@@ -14,6 +14,12 @@ class TopologyFilterForm(BootstrapMixin, forms.Form):
         queryset=Device.objects.all(),
         to_field_name='id',
         required=False,
+        null_option='None',
+    )
+    location_id = DynamicModelMultipleChoiceField(
+        queryset=Location.objects.all(),
+        required=False,
+        to_field_name='id',
         null_option='None',
     )
     site_id = DynamicModelMultipleChoiceField(
