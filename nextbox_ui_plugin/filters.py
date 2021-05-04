@@ -1,5 +1,5 @@
 import django_filters
-from dcim.models import Device, Site, Region
+from dcim.models import Device, Location, Site, Region
 
 
 class TopologyFilterSet(django_filters.FilterSet):
@@ -9,6 +9,10 @@ class TopologyFilterSet(django_filters.FilterSet):
         to_field_name='id',
         field_name='id',
         label='Device (ID)',
+    )
+    location_id = django_filters.ModelMultipleChoiceFilter(
+        queryset=Location.objects.all(),
+        label='Location (ID)',
     )
     site_id = django_filters.ModelMultipleChoiceFilter(
         queryset=Site.objects.all(),
