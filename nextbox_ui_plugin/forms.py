@@ -3,7 +3,16 @@ from utilities.forms import (
     BootstrapMixin, DynamicModelMultipleChoiceField,
 )
 from .models import SavedTopology
-from dcim.models import Device, Location, Site, Region
+from dcim.models import Device, Site, Region
+from django.conf import settings
+from packaging import version
+
+NETBOX_CURRENT_VERSION = version.parse(settings.VERSION)
+
+if NETBOX_CURRENT_VERSION >= version.parse("2.11.0"):
+    from dcim.models import Location
+else:
+    from dcim.models import RackGroup as Location
 
 
 class TopologyFilterForm(BootstrapMixin, forms.Form):
