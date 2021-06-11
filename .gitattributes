@@ -1,1 +1,3 @@
 nextbox_ui_plugin/static/nextbox_ui_plugin/next_sources/* linguist-vendored
+*.html linguist-vendored
+*.htm linguist-vendored
