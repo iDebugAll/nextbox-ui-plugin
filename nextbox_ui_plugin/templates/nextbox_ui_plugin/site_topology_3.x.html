@@ -38,7 +38,7 @@
                         {% for tag, is_visible in device_tags %}
                             <div class="checkbox ml-1 my-1">
                                 <label>
-                                   <input onchange="layerSelectorByTagOnChange(this)" type="checkbox" value="{{ tag }}" >{{ tag }}
+                                   <input onchange="layerSelectorByTagOnChange(this)" type="checkbox" value="{{ tag }}"  {{ is_visible|yesno:"checked," }}>{{ tag }}
                                 </label>
                             </div>
                         {% endfor %}

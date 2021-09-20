@@ -60,7 +60,7 @@
                         {% for device_role_slug, device_role_name, is_visible in device_roles %}
                             <div class="checkbox ml-1 my-1">
                                 <label>
-                                    <input onchange="layerSelectorOnChange(this)" type="checkbox" value="{{ device_role_slug }}" >{{ device_role_name }}
+                                    <input onchange="layerSelectorOnChange(this)" type="checkbox" value="{{ device_role_slug }}" {{ is_visible|yesno:"checked," }}>{{ device_role_name }}
                                 </label>
                             </div>
                         {% endfor %}
