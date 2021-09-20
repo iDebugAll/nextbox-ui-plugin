@@ -380,7 +380,10 @@ class TopologyView(PermissionRequiredMixin, View):
     permission_required = ('dcim.view_site', 'dcim.view_device', 'dcim.view_cable')
     queryset = Device.objects.all()
     filterset = filters.TopologyFilterSet
-    template_name = 'nextbox_ui_plugin/topology.html'
+    if NETBOX_CURRENT_VERSION >= version.parse("3.0"):
+        template_name = 'nextbox_ui_plugin/topology_3.x.html'
+    else:
+        template_name = 'nextbox_ui_plugin/topology.html'
 
     def get(self, request):
 
@@ -417,9 +420,13 @@ class TopologyView(PermissionRequiredMixin, View):
                 label_suffix='',
                 user=request.user
             ),
+            'load_saved': SavedTopology.objects.all(), 
             'requestGET': dict(request.GET),
         })
 
 
 class SiteTopologyView(TopologyView):
-    template_name = 'nextbox_ui_plugin/site_topology.html'
+    if NETBOX_CURRENT_VERSION >= version.parse("3.0"):
+        template_name = 'nextbox_ui_plugin/site_topology_3.x.html'
+    else:
+        template_name = 'nextbox_ui_plugin/site_topology.html'
