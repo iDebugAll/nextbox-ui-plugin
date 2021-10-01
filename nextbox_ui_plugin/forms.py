@@ -1,6 +1,9 @@
 from django import forms
+from ipam.models import VLAN
 from utilities.forms import (
-    BootstrapMixin, DynamicModelMultipleChoiceField,
+    BootstrapMixin,
+    DynamicModelMultipleChoiceField,
+    DynamicModelChoiceField
 )
 from .models import SavedTopology
 from dcim.models import Device, Site, Region
@@ -40,6 +43,12 @@ class TopologyFilterForm(BootstrapMixin, forms.Form):
         to_field_name='id',
         null_option='None',
     )
+    vlan_id = DynamicModelChoiceField(
+        queryset=VLAN.objects.all(),
+        required=False,
+        to_field_name='id',
+        null_option='None',
+    )
     region_id = DynamicModelMultipleChoiceField(
         queryset=Region.objects.all(),
         required=False,
@@ -50,6 +59,7 @@ class TopologyFilterForm(BootstrapMixin, forms.Form):
         device_id.label = _('Devices')
         location_id.label = _('Location')
         site_id.label = _('Sites')
+        vlan_id.label = _('Vlan')
         region_id.label = _('Regions')
 
 

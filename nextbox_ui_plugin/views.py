@@ -3,6 +3,7 @@
 from django.shortcuts import render
 from django.views.generic import View
 from dcim.models import Cable, Device, Interface, DeviceRole
+from ipam.models import VLAN
 from .models import SavedTopology
 from . import forms, filters
 from django.contrib.auth.mixins import PermissionRequiredMixin
@@ -10,6 +11,7 @@ from django.conf import settings
 from packaging import version
 import json
 import re
+
 
 NETBOX_CURRENT_VERSION = version.parse(settings.VERSION)
 
@@ -227,6 +229,91 @@ def filter_tags(tags):
         tags = filtered_tags
     return tags
 
+def get_vlan_topology(nb_devices_qs, vlans):
+
+    topology_dict = {'nodes': [], 'links': []}
+    device_roles = set()
+    all_device_tags = set()
+    multi_cable_connections = []
+    vlan = VLAN.objects.get(id=vlans[0])
+    interfaces = vlan.get_interfaces()
+    filtred_devices = [d.id for d in nb_devices_qs]
+    filtred_interfaces = []
+    for interface in interfaces:
+        if interface.is_connectable:
+            direct_device_id = interface.device.id
+            interface_trace = interface.trace()
+            if len(interface_trace) != 0:
+                termination_b_iface = interface_trace[-1][-1]
+                connected_device_id = termination_b_iface.device.id
+                if (direct_device_id in filtred_devices) or (direct_device_id in filtred_devices):
+                    filtred_interfaces.append(interface)
+
+    
+
+    devices = []
+    for interface in filtred_interfaces:
+        if interface.is_connectable:
+            if interface.device not in devices:
+                devices.append(interface.device)
+            interface_trace = interface.trace()
+            if len(interface_trace) != 0:
+                termination_b_iface = interface_trace[-1][-1]
+                if termination_b_iface.device not in devices:
+                    devices.append(termination_b_iface.device)
+         
+
+    device_ids = [d.id for d in devices]
+    for device in devices:
+        device_is_passive = False
+        device_url = device.get_absolute_url()
+        primary_ip = ''
+        if device.primary_ip:
+            primary_ip = str(device.primary_ip.address)
+        tags = [str(tag) for tag in device.tags.names()]
+        for tag in tags:
+            all_device_tags.add((tag, not tag_is_hidden(tag)))
+        topology_dict['nodes'].append({
+            'id': device.id,
+            'name': device.name,
+            'dcimDeviceLink': device_url,
+            'primaryIP': primary_ip,
+            'serial_number': device.serial,
+            'model': device.device_type.model,
+            'deviceRole': device.device_role.slug,
+            'layerSortPreference': get_node_layer_sort_preference(
+                device.device_role.slug
+                ),
+            'icon': get_icon_type(
+                device.id
+                ),
+            'isPassive': device_is_passive,
+            'tags': tags,
+            })
+        is_visible = not (device.device_role.slug in UNDISPLAYED_DEVICE_ROLE_SLUGS)
+        device_roles.add((device.device_role.slug, device.device_role.name, is_visible))
+    
+    mapped_links = []
+    for interface in filtred_interfaces:
+        if interface.is_connectable:
+            interface_trace = interface.trace()
+            if len(interface_trace) != 0:
+                source_cable = interface_trace[0]
+                dest_cable = interface_trace[-1]
+                mapping_link = [source_cable[0].device.id,dest_cable[-1].device.id]
+                if (mapping_link not in mapped_links) and (mapping_link.reverse() not in mapped_links):
+                    mapped_links.append(mapping_link)
+
+                    topology_dict['links'].append({
+                        'id': source_cable[1].id,
+                        'source': source_cable[0].device.id,
+                        'target': dest_cable[-1].device.id,
+                        "srcIfName": if_shortname(source_cable[0].name),
+                        "tgtIfName": if_shortname(dest_cable[-1].name),
+                        })
+
+    return topology_dict, device_roles, multi_cable_connections, list(all_device_tags)
+
 
 def get_topology(nb_devices_qs):
     topology_dict = {'nodes': [], 'links': []}
@@ -398,8 +485,19 @@ class TopologyView(PermissionRequiredMixin, View):
         if saved_topology_id is not None:
             topology_dict, device_roles, device_tags, layout_context = get_saved_topology(saved_topology_id)
         else:
-            self.queryset = self.filterset(request.GET, self.queryset).qs
-            topology_dict, device_roles, multi_cable_connections, device_tags = get_topology(self.queryset)
+            vlans = []
+            if 'vlan_id' in request.GET:
+                clean_request = request.GET.copy()
+                clean_request.pop('vlan_id')
+                vlans = request.GET.get('vlan_id')
+            else:
+                clean_request = request.GET.copy()
+
+            self.queryset = self.filterset(clean_request, self.queryset).qs
+            if len(vlans) == 0:
+                topology_dict, device_roles, multi_cable_connections, device_tags = get_topology(self.queryset)
+            else:
+                topology_dict, device_roles, multi_cable_connections, device_tags = get_vlan_topology(self.queryset, vlans)
 
         return render(request, self.template_name, {
             'source_data': json.dumps(topology_dict),
