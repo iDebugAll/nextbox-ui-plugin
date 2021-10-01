@@ -235,7 +235,7 @@ def get_vlan_topology(nb_devices_qs, vlans):
     device_roles = set()
     all_device_tags = set()
     multi_cable_connections = []
-    vlan = VLAN.objects.get(id=vlans[0])
+    vlan = VLAN.objects.get(id=vlans)
     interfaces = vlan.get_interfaces()
     filtred_devices = [d.id for d in nb_devices_qs]
     filtred_interfaces = []
