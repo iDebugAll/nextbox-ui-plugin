@@ -234,7 +234,7 @@ Update a netbox image name in **docker-compose.yml** in a Netbox Community Docke
 ```yaml
 services:
   netbox: &netbox
-    image: ghrc.io/idebugall/nextbox-ui-plugin:latest
+    image: ghcr.io/idebugall/nextbox-ui-plugin:latest
 ```
 Update a **configuration.py**. It is stored in netbox-docker/configuration/ by default. Update or add PLUGINS parameter and PLUGINS_CONFIG parameter as described above.
 
