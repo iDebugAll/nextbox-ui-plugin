@@ -141,6 +141,9 @@ UNDISPLAYED_DEVICE_ROLE_SLUGS = PLUGIN_SETTINGS.get("undisplayed_device_role_slu
 # Hide devices tagged with these tags
 UNDISPLAYED_DEVICE_TAGS = PLUGIN_SETTINGS.get("undisplayed_device_tags", tuple())
 
+# Hide interfaces with specific names.
+UNDISPLAYED_INTERFACE_NAMES = PLUGIN_SETTINGS.get("undisplayed_interface_names", tuple())
+
 # Filter device tags listed in Select Layers menu
 SELECT_LAYERS_LIST_INCLUDE_DEVICE_TAGS = PLUGIN_SETTINGS.get("select_layers_list_include_device_tags", tuple())
 SELECT_LAYERS_LIST_EXCLUDE_DEVICE_TAGS = PLUGIN_SETTINGS.get("select_layers_list_exclude_device_tags", tuple())
@@ -240,14 +243,19 @@ def get_vlan_topology(nb_devices_qs, vlans):
     filtred_devices = [d.id for d in nb_devices_qs]
     filtred_interfaces = []
     for interface in interfaces:
-        if interface.is_connectable:
+        if hasattr(interface, 'is_connectable') and interface.is_connectable:
             direct_device_id = interface.device.id
             interface_trace = interface.trace()
             if len(interface_trace) != 0:
                 termination_b_iface = interface_trace[-1][-1]
-                connected_device_id = termination_b_iface.device.id
-                if (direct_device_id in filtred_devices) or (direct_device_id in filtred_devices):
-                    filtred_interfaces.append(interface)
+
+                if (
+                    interface.name.lower() not in UNDISPLAYED_INTERFACE_NAMES
+                    and termination_b_iface.name.lower() not in UNDISPLAYED_INTERFACE_NAMES
+                ):
+                    connected_device_id = termination_b_iface.device.id
+                    if (direct_device_id in filtred_devices) or (direct_device_id in filtred_devices):
+                        filtred_interfaces.append(interface)
 
     
 
@@ -295,11 +303,12 @@ def get_vlan_topology(nb_devices_qs, vlans):
     
     mapped_links = []
     for interface in filtred_interfaces:
-        if interface.is_connectable:
+        if hasattr(interface, 'is_connectable') and interface.is_connectable:
             interface_trace = interface.trace()
             if len(interface_trace) != 0:
                 source_cable = interface_trace[0]
                 dest_cable = interface_trace[-1]
+
                 mapping_link = [source_cable[0].device.id,dest_cable[-1].device.id]
                 if (mapping_link not in mapped_links) and (mapping_link.reverse() not in mapped_links):
                     mapped_links.append(mapping_link)
@@ -374,7 +383,11 @@ def get_topology(nb_devices_qs):
         for link in links_from_device:
             # Include links to discovered devices only
             if link._termination_b_device_id in device_ids:
-                links.append(link)
+                if (
+                    link.termination_a.name.lower() not in UNDISPLAYED_INTERFACE_NAMES
+                    and link.termination_b.name.lower() not in UNDISPLAYED_INTERFACE_NAMES
+                ):
+                    links.append(link)
     device_roles = list(device_roles)
     device_roles.sort(key=lambda i: get_node_layer_sort_preference(i[0]))
     all_device_tags = list(all_device_tags)
