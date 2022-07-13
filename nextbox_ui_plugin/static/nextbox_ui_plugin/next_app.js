@@ -367,6 +367,7 @@
                     'displayPassiveDevices': !displayPassiveDevices,
                     'displayLogicalMultiCableLinks': displayLogicalMultiCableLinks,
                     'requestGET': requestGET,
+                    'initialFilters': initialFilters,
                 })
             },
             headers: {'X-CSRFToken': CSRFToken},

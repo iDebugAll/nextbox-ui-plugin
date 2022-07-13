@@ -11,6 +11,8 @@ from django.conf import settings
 from packaging import version
 import json
 import re
+from django.http import QueryDict
+from django.http.request import MultiValueDict
 
 
 NETBOX_CURRENT_VERSION = version.parse(settings.VERSION)
@@ -473,32 +475,72 @@ class TopologyView(PermissionRequiredMixin, View):
         template_name = 'nextbox_ui_plugin/topology.html'
 
     def get(self, request):
+        def get_topology_data(request, queryset):
+            """Function to get fresh topology data"""
+            vlans = []
+            if 'vlan_id' in request:
+                clean_request = request.copy()
+                clean_request.pop('vlan_id')
+                vlans = request.get('vlan_id')
+            else:
+                clean_request = request.copy()
+
+            queryset = self.filterset(clean_request, queryset).qs
+            if len(vlans) == 0:
+                topology_dict, device_roles, multi_cable_connections, device_tags = get_topology(queryset)
+            else:
+                topology_dict, device_roles, multi_cable_connections, device_tags = get_vlan_topology(queryset,
+                                                                                                      vlans)
+            return topology_dict, device_roles, multi_cable_connections, device_tags
 
         if not request.GET:
             self.queryset = Device.objects.none()
-        elif 'saved_topology_id' in request.GET:
-            self.queryset = Device.objects.none()
 
         saved_topology_id = request.GET.get('saved_topology_id')
+        updated = request.GET.get('has_update')
         layout_context = {}
 
+        has_update = False
+
         if saved_topology_id is not None:
+
             topology_dict, device_roles, device_tags, layout_context = get_saved_topology(saved_topology_id)
+            # getting initial filters of first save
+            initial_filter = layout_context['initialFilters']
+
+            _request = QueryDict('', mutable=True)
+            _request.update(MultiValueDict(layout_context['initialFilters']))
+            new_topology_dict, new_device_roles, new_multi_cable_connections, new_device_tags = get_topology_data(
+                _request,
+                self.queryset)
+
+            new_interfaces = {'nodes': [], 'links': []}
+            # comparing current topology with saved
+            for new_value in new_topology_dict['nodes']:
+                if not any(saved_dict['id'] == new_value['id'] for saved_dict in topology_dict['nodes']):
+                    new_value_to_save = new_value.copy()
+                    new_value_to_save.update(x=0.0, y=0.0, px=0.0, py=0.0, weight=0)
+                    new_interfaces['nodes'].append(new_value_to_save)
+
+            for new_node in new_interfaces['nodes']:
+                for new_link in new_topology_dict['links']:
+                    if new_link['source'] == new_node['id']:
+                        new_interfaces['links'].append(new_link)
+
+            if new_interfaces['nodes']:
+                has_update = True
+            # if request.GET has update param updating old topology and return it
+            if updated:
+                topology_dict['nodes'].extend(new_interfaces['nodes'])
+                topology_dict['links'].extend(new_interfaces['links'])
+                topology_data = SavedTopology.objects.get(id=saved_topology_id)
+                topology_data.topology = topology_dict
+                topology_data.save()
+                has_update = False
         else:
-            vlans = []
-            if 'vlan_id' in request.GET:
-                clean_request = request.GET.copy()
-                clean_request.pop('vlan_id')
-                vlans = request.GET.get('vlan_id')
-            else:
-                clean_request = request.GET.copy()
-
-            self.queryset = self.filterset(clean_request, self.queryset).qs
-            if len(vlans) == 0:
-                topology_dict, device_roles, multi_cable_connections, device_tags = get_topology(self.queryset)
-            else:
-                topology_dict, device_roles, multi_cable_connections, device_tags = get_vlan_topology(self.queryset, vlans)
-
+            initial_filter = dict(request.GET)
+            topology_dict, device_roles, multi_cable_connections, device_tags = get_topology_data(request.GET,
+                                                                                                  self.queryset)
         return render(request, self.template_name, {
             'source_data': json.dumps(topology_dict),
             'display_unconnected': layout_context.get('displayUnconnected') or DISPLAY_UNCONNECTED,
@@ -518,8 +560,10 @@ class TopologyView(PermissionRequiredMixin, View):
                 label_suffix='',
                 user=request.user
             ),
-            'load_saved': SavedTopology.objects.all(), 
+            'load_saved': SavedTopology.objects.all(),
             'requestGET': dict(request.GET),
+            'has_update': has_update,
+            'initial_filters': json.dumps(initial_filter)
         })
 
 
