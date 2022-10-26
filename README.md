@@ -1,6 +1,6 @@
 # NextBox UI Plugin
 
-A topology visualization plugin for [NetBox](https://github.com/netbox-community/netbox) powered by [NextUI](https://developer.cisco.com/site/neXt/) Toolkit. Netbox v2.8.0+ is required.
+A topology visualization plugin for [NetBox](https://github.com/netbox-community/netbox) powered by [NextUI](https://developer.cisco.com/site/neXt/) Toolkit. Netbox v3.3.0+ is required.
 
 # Installation
 
@@ -15,10 +15,10 @@ $ source /opt/netbox/venv/bin/activate
 ```
 
 ### Package Installation from Source Code
-The source code is available on [GitHub](https://github.com/iDebugAll/nextbox-ui-plugin).<br/>
+The source code is available on [GitHub](https://github.com/Qwiko/nextbox-ui-plugin).<br/>
 Download and install the package. Assuming you use a Virtual Environment for Netbox:
 ```
-$ git clone https://github.com/iDebugAll/nextbox-ui-plugin
+$ git clone https://github.com/Qwiko/nextbox-ui-plugin
 $ cd nextbox-ui-plugin
 $ source /opt/netbox/venv/bin/activate
 (venv) $ pip3 install .
@@ -232,7 +232,7 @@ The Plugin may be installed in a Netbox Docker deployment.
 The package contains a Dockerfile for [Netbox-Community Docker](https://github.com/netbox-community/netbox-docker) extension. Latest-LDAP version is used by default as a source.<br/>
 Download the Plugin and build from the source:
 ```
-$ git clone https://github.com/iDebugAll/nextbox-ui-plugin
+$ git clone https://github.com/Qwiko/nextbox-ui-plugin
 $ cd nextbox-ui-plugin
 $ docker build -t netbox-custom .
 ```
