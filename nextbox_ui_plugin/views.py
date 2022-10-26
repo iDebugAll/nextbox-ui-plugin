@@ -13,8 +13,6 @@ import json
 import re
 
 
-NETBOX_CURRENT_VERSION = version.parse(settings.VERSION)
-
 # Default NeXt UI icons
 SUPPORTED_ICONS = {
     'switch',
@@ -403,11 +401,8 @@ def get_topology(nb_devices_qs):
         trace_result = interface_side.trace()
         if not trace_result:
             continue
-        if NETBOX_CURRENT_VERSION >= version.parse("2.10.1"):
-            # Version 2.10.1 introduces some changes in cable trace behavior.
-            cable_path = trace_result
-        else:
-            cable_path, *ignore = trace_result
+        cable_path = trace_result
+
         # identify segmented cable paths between end-devices
         if len(cable_path) < 2:
             continue
@@ -468,10 +463,7 @@ class TopologyView(PermissionRequiredMixin, View):
     permission_required = ('dcim.view_site', 'dcim.view_device', 'dcim.view_cable')
     queryset = Device.objects.all()
     filterset = filters.TopologyFilterSet
-    if NETBOX_CURRENT_VERSION >= version.parse("3.0"):
-        template_name = 'nextbox_ui_plugin/topology_3.x.html'
-    else:
-        template_name = 'nextbox_ui_plugin/topology.html'
+    template_name = 'nextbox_ui_plugin/topology.html'
 
     def get(self, request):
 
@@ -525,7 +517,4 @@ class TopologyView(PermissionRequiredMixin, View):
 
 
 class SiteTopologyView(TopologyView):
-    if NETBOX_CURRENT_VERSION >= version.parse("3.0"):
-        template_name = 'nextbox_ui_plugin/site_topology_3.x.html'
-    else:
-        template_name = 'nextbox_ui_plugin/site_topology.html'
+    template_name = 'nextbox_ui_plugin/site_topology.html'
