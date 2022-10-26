@@ -7,14 +7,14 @@ with open(path.join(top_level_directory, 'README.md'), encoding='utf-8') as file
 
 setup(
     name='nextbox_ui_plugin',
-    version='0.9.2',
+    version='0.9.3',
     url='https://github.com/iDebugAll/nextbox-ui-plugin',
     download_url='https://github.com/iDebugAll/nextbox-ui-plugin/archive/v0.9.2.tar.gz',
     description='A topology visualization plugin for Netbox powered by NextUI Toolkit.',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    author='Igor Korotchenkov',
-    author_email='iDebugAll@gmail.com',
+    author='Jakob Mellberg',
+    author_email='jakob.mellberg@gmail.com',
     install_requires=[],
     packages=find_packages(),
     license='MIT',
