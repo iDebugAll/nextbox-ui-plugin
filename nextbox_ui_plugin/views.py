@@ -340,13 +340,13 @@ def get_topology(nb_devices_qs):
             # Device is considered passive if it has no linked Interfaces.
             # Passive cabling devices use Rear and Front Ports.
             for link in links_from_device:
-                if isinstance(link.a_terminations[0], Interface) and link.a_terminations.device.id == nb_device.id:
+                if isinstance(link.a_terminations[0], Interface) and link.a_terminations[0].device.id == nb_device.id:
                     break
             else:
                 device_is_passive = True
         if links_to_device:
             for link in links_to_device:
-                if isinstance(link.b_terminations[0], Interface) and link.b_terminations.device.id == nb_device.id:
+                if isinstance(link.b_terminations[0], Interface) and link.b_terminations[0].device.id == nb_device.id:
                     break
             else:
                 device_is_passive = True
