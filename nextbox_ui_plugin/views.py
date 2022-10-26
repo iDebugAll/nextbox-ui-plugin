@@ -337,19 +337,16 @@ def get_topology(nb_devices_qs):
         links_from_device = Cable.objects.filter(terminations__cable_end='A', terminations___device_id=nb_device.id)
         links_to_device = Cable.objects.filter(terminations__cable_end='B', terminations___device_id=nb_device.id)
         if links_from_device:
-            print("LINKS:", list(links_from_device))
             # Device is considered passive if it has no linked Interfaces.
             # Passive cabling devices use Rear and Front Ports.
             for link in links_from_device:
-                print("LINK:", link)
-                print("A_TERM:", link.a_terminations)
-                if isinstance(link.a_terminations, Interface) and link.a_terminations.device.id == nb_device.id:
+                if isinstance(link.a_terminations[0], Interface) and link.a_terminations.device.id == nb_device.id:
                     break
             else:
                 device_is_passive = True
         if links_to_device:
             for link in links_to_device:
-                if isinstance(link.b_terminations, Interface) and link.b_terminations.device.id == nb_device.id:
+                if isinstance(link.b_terminations[0], Interface) and link.b_terminations.device.id == nb_device.id:
                     break
             else:
                 device_is_passive = True
@@ -377,7 +374,6 @@ def get_topology(nb_devices_qs):
         for link in links_from_device:
             # Include links to discovered devices only
             for b_termination in link.b_terminations:
-                print("TEST:", b_termination.device_id)
                 if b_termination.device_id in device_ids:
                     links.append(link)
     device_roles = list(device_roles)
@@ -396,14 +392,14 @@ def get_topology(nb_devices_qs):
             "srcIfName": if_shortname(link.a_terminations[0].name),
             "tgtIfName": if_shortname(link.b_terminations[0].name)
         })
-        if not (isinstance(link.a_terminations, Interface) or isinstance(link.b_terminations, Interface)):
+        if not (isinstance(link.a_terminations[0], Interface) or isinstance(link.b_terminations[0], Interface)):
             # Skip trace if none of cable terminations is an Interface
             continue
         interface_side = None
-        if isinstance(link.a_terminations, Interface):
-            interface_side = link.a_terminations
-        elif isinstance(link.b_terminations, Interface):
-            interface_side = link.b_terminations
+        if isinstance(link.a_terminations[0], Interface):
+            interface_side = link.a_terminations[0]
+        elif isinstance(link.b_terminations[0], Interface):
+            interface_side = link.b_terminations[0]
         trace_result = interface_side.trace()
         if not trace_result:
             continue
