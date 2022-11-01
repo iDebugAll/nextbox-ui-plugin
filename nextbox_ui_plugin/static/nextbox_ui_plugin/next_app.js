@@ -77,6 +77,7 @@
     });
     
     topo.registerIcon("dead_node", "/static/nextbox_ui_plugin/img/dead_node.png", 49, 49);
+    topo.registerIcon("patch_panel", "/static/nextbox_ui_plugin/img/patch_panel", 49, 49);
     
     var Shell = nx.define(nx.ui.Application, {
         methods: {
