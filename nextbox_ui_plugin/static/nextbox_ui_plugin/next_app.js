@@ -54,7 +54,7 @@
             // Display Links as curves in case of 
             //multiple links between Node Pairs.
             // Set to 'parallel' to use parallel links.
-            linkType: 'curve',
+            linkType: 'parallel',
             sourcelabel: 'model.srcIfName',
             targetlabel: 'model.tgtIfName',
             style: function(model) {
@@ -77,7 +77,7 @@
     });
     
     topo.registerIcon("dead_node", "/static/nextbox_ui_plugin/img/dead_node.png", 49, 49);
-    topo.registerIcon("patch_panel", "/static/nextbox_ui_plugin/img/patch_panel", 49, 49);
+    topo.registerIcon("patch_panel", "/static/nextbox_ui_plugin/img/patch_panel.png", 49, 49);
     
     var Shell = nx.define(nx.ui.Application, {
         methods: {
@@ -225,24 +225,30 @@
                 line = line.pad(18 * stageScale, 18 * stageScale);
                 
                 if (this.sourcelabel()) {
+                    
                     el = this.view('source');
                     point = line.start;
+                    offset = (this._offsetRadix * this._offsetPercentage) * 3
+                    console.log(this._sourcelabel, offset);
                     el.set('x', point.x);
-                    el.set('y', point.y);
+                    el.set('y', point.y + offset);
                     el.set('text', this.sourcelabel());
                     el.set('transform', 'rotate(' + angle + ' ' + point.x + ',' + point.y + ')');
-                    el.setStyle('font-size', 11 * stageScale);
+                    el.setStyle('font-size', 2 * stageScale);
                 }
                 
                 
                 if (this.targetlabel()) {
+                    
                     el = this.view('target');
                     point = line.end;
+                    offset = (this._offsetRadix * this._offsetPercentage) * 3
+                    
                     el.set('x', point.x);
-                    el.set('y', point.y);
+                    el.set('y', point.y + offset);
                     el.set('text', this.targetlabel());
                     el.set('transform', 'rotate(' + angle + ' ' + point.x + ',' + point.y + ')');
-                    el.setStyle('font-size', 11 * stageScale);
+                    el.setStyle('font-size', 2 * stageScale);
                 }
             }
         }
@@ -282,7 +288,7 @@
         });
         topo.activateLayout('hierarchicalLayout');
     };
-    showHideUndonnected = function() {
+    showHideUnconnected = function() {
         let unconnectedNodes = []
         topologyData['nodes'].forEach(function(node){
             var isUnconnected = true
@@ -354,37 +360,30 @@
         var saveResultLabel = document.getElementById('saveResult');
         saveButton.setAttribute('disabled', true);
         saveResultLabel.setAttribute('innerHTML', 'Processing');
-        $.ajax({
-            type: 'POST',
-            url: topoSaveURI,
-            data: {
-                'name': topoSaveName,
-                'topology': JSON.stringify(topo.data()),
-                'layout_context': JSON.stringify({
-                    'initialLayout': initialLayout,
-                    'displayUnconnected': !displayUnconnected,
-                    'undisplayedRoles': undisplayedRoles,
-                    'undisplayedDeviceTags': undisplayedDeviceTags,
-                    'displayPassiveDevices': !displayPassiveDevices,
-                    'displayLogicalMultiCableLinks': displayLogicalMultiCableLinks,
-                    'requestGET': requestGET,
-                })
-            },
-            headers: {'X-CSRFToken': CSRFToken},
-            success: function (response) {
-                saveResultLabel.innerHTML = 'Success';
-                saveButton.removeAttribute('disabled');
-                console.log(response);
-            },
-            error: function (response) {
-                saveResultLabel.innerHTML = 'Failed';
-                console.log(response);
-            }
+        fetch(topoSaveURI, {method: "POST", headers: {'X-CSRFToken': CSRFToken, 'Content-Type': "application/json"}, body: JSON.stringify({
+            'name': topoSaveName,
+            'topology': JSON.stringify(topo.data()),
+            'layout_context': JSON.stringify({
+                'initialLayout': initialLayout,
+                'displayUnconnected': !displayUnconnected,
+                'undisplayedRoles': undisplayedRoles,
+                'undisplayedDeviceTags': undisplayedDeviceTags,
+                'displayPassiveDevices': !displayPassiveDevices,
+                'displayLogicalMultiCableLinks': displayLogicalMultiCableLinks,
+                'requestGET': requestGET,
+            })
+        })}).then(response => response.json()).then((data) => {
+            saveResultLabel.innerHTML = 'Success';
+            saveButton.removeAttribute('disabled');
+            console.log(data);
+        }).catch(error => {
+            saveResultLabel.innerHTML = 'Failed';
+            console.log(error);
         })
     };
 
     topo.on('topologyGenerated', function(){
-        showHideUndonnected();
+        showHideUnconnected();
         showHidePassiveDevices();
         if (displayPassiveDevices) {
             displayLogicalMultiCableLinks = true;
