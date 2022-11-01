@@ -2,13 +2,8 @@ import django_filters
 from dcim.models import Device, Site, Region
 from django.conf import settings
 from packaging import version
+from dcim.models import Location
 
-NETBOX_CURRENT_VERSION = version.parse(settings.VERSION)
-
-if NETBOX_CURRENT_VERSION >= version.parse("2.11.0"):
-    from dcim.models import Location
-else:
-    from dcim.models import RackGroup as Location
 
 
 class TopologyFilterSet(django_filters.FilterSet):
