@@ -229,7 +229,6 @@
                     el = this.view('source');
                     point = line.start;
                     offset = (this._offsetRadix * this._offsetPercentage) * 3
-                    console.log(this._sourcelabel, offset);
                     el.set('x', point.x);
                     el.set('y', point.y + offset);
                     el.set('text', this.sourcelabel());
