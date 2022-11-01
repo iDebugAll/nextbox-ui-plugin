@@ -383,7 +383,7 @@ def get_topology(nb_devices_qs):
     for link in links:
         link_ids.add(link.id)
         
-        #Skip if cable is to or from a PowerFeed
+        #Skip if link is towards a PowerFeed
         if (isinstance(link.a_terminations[0], PowerFeed) or (isinstance(link.b_terminations[0], PowerFeed))):
             continue
         
@@ -391,8 +391,8 @@ def get_topology(nb_devices_qs):
             'id': link.id,
             'source': link.a_terminations[0].device_id,
             'target': link.b_terminations[0].device_id,
-            "srcIfName": if_shortname(link.a_terminations[0].name),
-            "tgtIfName": if_shortname(link.b_terminations[0].name)
+            "srcIfName": if_shortname(", ".join([a_link.name for a_link in link.a_terminations])),
+            "tgtIfName": if_shortname(", ".join([b_link.name for b_link in link.b_terminations]))
         })
         if not (isinstance(link.a_terminations[0], Interface) or isinstance(link.b_terminations[0], Interface)):
             # Skip trace if none of cable terminations is an Interface
