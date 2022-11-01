@@ -16,7 +16,7 @@
                   <button class="btn btn-primary btn-sm " onclick='horizontal()'>Horizontal Layout</button>
                   <button class="btn btn-primary btn-sm" onclick="vertical()">Vertical Layout</button>
               </div>
-              <input class="btn btn-primary btn-sm" type="button" id="showHideUndonnectedButton" value="" onclick="return showHideUndonnectedButtonOnClick(this);" />
+              <input class="btn btn-primary btn-sm" type="button" id="showHideUnconnectedButton" value="" onclick="return showHideUnconnectedButtonOnClick(this);" />
               <input class="btn btn-primary btn-sm" type="button" id="showHidePassiveDevicesButton" value="" onclick="return showHidePassiveDevicesButtonOnClick(this);" />
               <div class="dropdown btn-group">
                   <button class="btn btn-primary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -60,7 +60,7 @@
             console.log(topologyData);
         </script>
         <script type="text/javascript">
-            showHideUndonnectedButtonInitial();
+            showHideUnconnectedButtonInitial();
             showHidePassiveDevicesButtonInitial();
         </script>
         <script src="{% static 'nextbox_ui_plugin/next_app.js' %}"></script>

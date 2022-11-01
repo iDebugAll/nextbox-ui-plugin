@@ -1,19 +1,19 @@
-function showHideUndonnectedButtonInitial() {
-    showHideUndonnectedButton = document.getElementById("showHideUndonnectedButton");
+function showHideUnconnectedButtonInitial() {
+    showHideUnconnectedButton = document.getElementById("showHideUnconnectedButton");
     if (displayUnconnected == false) {
-        showHideUndonnectedButton.value = 'Display Unconnected'
+        showHideUnconnectedButton.value = 'Display Unconnected'
     } else {
-        showHideUndonnectedButton.value = 'Hide Unconnected';
+        showHideUnconnectedButton.value = 'Hide Unconnected';
     };
 };
 
-function showHideUndonnectedButtonOnClick(button) {
+function showHideUnconnectedButtonOnClick(button) {
     if (button.value == 'Hide Unconnected') {
         button.value = 'Display Unconnected'
     } else {
         button.value = 'Hide Unconnected';
     };
-    showHideUndonnected();
+    showHideUnconnected();
 };
 
 function layerSelectorOnChange(checkbox){
