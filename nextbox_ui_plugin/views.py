@@ -2,7 +2,7 @@
 
 from django.shortcuts import render
 from django.views.generic import View
-from dcim.models import Cable, Device, Interface, DeviceRole
+from dcim.models import Cable, Device, Interface, DeviceRole, PowerFeed
 from ipam.models import VLAN
 from .models import SavedTopology
 from . import forms, filters
@@ -334,20 +334,21 @@ def get_topology(nb_devices_qs):
             all_device_tags.add((tag, not tag_is_hidden(tag)))
         links_from_device = Cable.objects.filter(terminations__cable_end='A', terminations___device_id=nb_device.id)
         links_to_device = Cable.objects.filter(terminations__cable_end='B', terminations___device_id=nb_device.id)
+        
+        
         if links_from_device:
             # Device is considered passive if it has no linked Interfaces.
             # Passive cabling devices use Rear and Front Ports.
             for link in links_from_device:
-                if isinstance(link.a_terminations[0], Interface) and link.a_terminations[0].device.id == nb_device.id:
-                    break
+                for a_link in link.a_terminations:
+                    if isinstance(a_link, Interface) and a_link.device.id == nb_device.id:
+                        break
+                else:
+                    continue
+                break
             else:
                 device_is_passive = True
-        if links_to_device:
-            for link in links_to_device:
-                if isinstance(link.b_terminations[0], Interface) and link.b_terminations[0].device.id == nb_device.id:
-                    break
-            else:
-                device_is_passive = True
+    
         topology_dict['nodes'].append({
             'id': nb_device.id,
             'name': nb_device.name,
@@ -370,9 +371,7 @@ def get_topology(nb_devices_qs):
         if not links_from_device:
             continue
         for link in links_from_device:
-            # Include links to discovered devices only
-            for b_termination in link.b_terminations:
-                if b_termination.device_id in device_ids:
+            # Include links to discovered devices onlytopology_dict =
                     links.append(link)
     device_roles = list(device_roles)
     device_roles.sort(key=lambda i: get_node_layer_sort_preference(i[0]))
@@ -383,10 +382,15 @@ def get_topology(nb_devices_qs):
     link_ids = set()
     for link in links:
         link_ids.add(link.id)
+        
+        #Skip if cable is to or from a PowerFeed
+        if (isinstance(link.a_terminations[0], PowerFeed) or (isinstance(link.b_terminations[0], PowerFeed))):
+            continue
+        
         topology_dict['links'].append({
             'id': link.id,
-            'source': link.a_terminations[0].device.id,
-            'target': link.b_terminations[0].device.id,
+            'source': link.a_terminations[0].device_id,
+            'target': link.b_terminations[0].device_id,
             "srcIfName": if_shortname(link.a_terminations[0].name),
             "tgtIfName": if_shortname(link.b_terminations[0].name)
         })
@@ -421,6 +425,7 @@ def get_topology(nb_devices_qs):
             "tgtIfName": if_shortname(cable_path[-1][2].name),
             "isLogicalMultiCable": True,
         })
+
     return topology_dict, device_roles, multi_cable_connections, all_device_tags
 
 
