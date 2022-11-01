@@ -12,10 +12,7 @@ class SiteTopologyButtons(PluginTemplateExtension):
     model = 'dcim.site'
 
     def buttons(self):
-        if NETBOX_CURRENT_VERSION >= version.parse("3.0"):
-            return self.render('nextbox_ui_plugin/site_topo_button_3.x.html')
-        else:
-            return self.render('nextbox_ui_plugin/site_topo_button.html')
+        return self.render('nextbox_ui_plugin/site_topo_button.html')
 
 
 # PluginTemplateExtension subclasses must be packaged into an iterable named
