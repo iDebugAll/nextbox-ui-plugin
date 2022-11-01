@@ -6,7 +6,7 @@ from utilities.forms import (
     DynamicModelChoiceField
 )
 from .models import SavedTopology
-from dcim.models import Device, Site, Region
+from dcim.models import Device, Site, Region, Tenant
 from django.conf import settings
 from packaging import version
 
@@ -39,6 +39,12 @@ class TopologyFilterForm(BootstrapMixin, forms.Form):
     )
     site_id = DynamicModelMultipleChoiceField(
         queryset=Site.objects.all(),
+        required=False,
+        to_field_name='id',
+        null_option='None',
+    )
+    tenant_id = DynamicModelMultipleChoiceField(
+        queryset=Tenant.objects.all(),
         required=False,
         to_field_name='id',
         null_option='None',
