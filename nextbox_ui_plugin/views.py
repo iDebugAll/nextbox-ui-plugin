@@ -306,8 +306,12 @@ def get_vlan_topology(nb_devices_qs, vlans):
 
                     topology_dict['links'].append({
                         'id': source_cable[1].id,
+                        'dcimCableURL': source_cable[1].get_absolute_url(),
+                        'label': f"Cable {source_cable[1].id}",
                         'source': source_cable[0].device.id,
                         'target': dest_cable[-1].device.id,
+                        'sourceDeviceName': source_cable[0].device.name,
+                        'targetDeviceName': dest_cable[-1].device.name,
                         "srcIfName": if_shortname(source_cable[0].name),
                         "tgtIfName": if_shortname(dest_cable[-1].name),
                         })
@@ -413,13 +417,18 @@ def get_topology(nb_devices_qs):
     link_ids = set()
     for link in links:
         link_ids.add(link.id)
+        link_url = link.get_absolute_url()
         if NETBOX_CURRENT_VERSION > version.parse("3.3"):
             link.termination_a = link.a_terminations[0]
             link.termination_b = link.b_terminations[0]
         topology_dict['links'].append({
             'id': link.id,
+            'label': f"Cable {link.id}",
+            'dcimCableURL': link_url,
             'source': link.termination_a.device.id,
             'target': link.termination_b.device.id,
+            'sourceDeviceName': link.termination_a.device.name,
+            'targetDeviceName': link.termination_b.device.name,
             "srcIfName": if_shortname(link.termination_a.name),
             "tgtIfName": if_shortname(link.termination_b.name)
         })

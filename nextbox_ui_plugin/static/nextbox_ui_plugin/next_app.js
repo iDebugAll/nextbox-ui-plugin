@@ -47,7 +47,8 @@
         },
         // Tooltip content settings
         tooltipManagerConfig: {
-            nodeTooltipContentClass: 'CustomNodeTooltip'
+            nodeTooltipContentClass: 'CustomNodeTooltip',
+            linkTooltipContentClass: 'CustomLinkTooltip'
         },
         // Link settings
         linkConfig: {
@@ -170,6 +171,103 @@
     });
 
     nx.define('Tooltip.Node', nx.ui.Component, {
+        view: function(view){
+            view.content.push({
+            });
+            return view;
+        },
+        methods: {
+            attach: function(args) {
+                this.inherited(args);
+                this.model();
+            }
+        }
+    });
+
+    nx.define('CustomLinkTooltip', nx.ui.Component, {
+        properties: {
+            link: {},
+            topology: {}
+        },
+        view: {
+            content: [{
+                tag: 'div',
+                content: [{
+                    tag: 'h5',
+                    content: [{
+                        tag: 'a',
+                        content: '{#link.model.label}',
+                        props: {"href": "{#link.model.dcimCableURL}", "target": "_blank", "rel": "noopener noreferrer"}
+                    }],
+                    props: {
+                        "style": "border-bottom: dotted 1px; font-size:90%; word-wrap:normal; color:#003688"
+                    }
+                }, {
+                    tag: 'p',
+                    content: [
+                        {
+                        tag: 'label',
+                        content: 'Source Device: ',
+                    }, {
+                        tag: 'label',
+                        content: '{#link.model.sourceDeviceName}',
+                    }
+                    ],
+                    props: {
+                        "style": "font-size:80%;"
+                    }
+                }, {
+                    tag: 'p',
+                    content: [
+                        {
+                        tag: 'label',
+                        content: 'Source Interface: ',
+                    }, {
+                        tag: 'label',
+                        content: '{#link.model.srcIfName}',
+                    }
+                    ],
+                    props: {
+                        "style": "font-size:80%;"
+                    }
+                }, {
+                    tag: 'p',
+                    content: [
+                        {
+                        tag: 'label',
+                        content: 'Target Device: ',
+                    }, {
+                        tag: 'label',
+                        content: '{#link.model.targetDeviceName}',
+                    }
+                    ],
+                    props: {
+                        "style": "font-size:80%;"
+                    }
+                }, {
+                    tag: 'p',
+                    content: [
+                        {
+                        tag: 'label',
+                        content: 'Target Interface: ',
+                    }, {
+                        tag: 'label',
+                        content: '{#link.model.tgtIfName}',
+                    }
+                    ],
+                    props: {
+                        "style": "font-size:80%;"
+                    }
+                }
+            ],
+            props: {
+                "style": "width: 200px;"
+            }
+        }]
+        }
+    });
+
+    nx.define('Tooltip.Link', nx.ui.Component, {
         view: function(view){
             view.content.push({
             });
