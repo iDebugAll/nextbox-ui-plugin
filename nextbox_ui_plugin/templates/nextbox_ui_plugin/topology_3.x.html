@@ -160,6 +160,7 @@
     var requestGET = {{ requestGET|safe }};
     var netbox_csrf_token = '{{ csrf_token }}'
     var topoSaveURI = '{% url 'plugins-api:nextbox_ui_plugin-api:savedtopology-list' %}';
+    var initialFilters = {{ initial_filters|safe }};
     console.log(topologyData);
 </script>
 <script src="{% static 'nextbox_ui_plugin/next_app.js' %}"></script>
