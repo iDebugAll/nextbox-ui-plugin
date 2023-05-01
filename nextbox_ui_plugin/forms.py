@@ -1,10 +1,5 @@
 from django import forms
 from ipam.models import VLAN
-from utilities.forms import (
-    BootstrapMixin,
-    DynamicModelMultipleChoiceField,
-    DynamicModelChoiceField
-)
 from .models import SavedTopology
 from dcim.models import Device, Site, Region
 from django.conf import settings
@@ -19,6 +14,19 @@ else:
 
 if NETBOX_CURRENT_VERSION >= version.parse("3.0") :
     from django.utils.translation import gettext as _
+
+if NETBOX_CURRENT_VERSION < version.parse("3.5"):
+    from utilities.forms import (
+        BootstrapMixin,
+        DynamicModelMultipleChoiceField,
+        DynamicModelChoiceField
+    )
+else:
+    from utilities.forms import BootstrapMixin
+    from utilities.forms.fields import (
+        DynamicModelMultipleChoiceField,
+        DynamicModelChoiceField
+    )
 
 
 class TopologyFilterForm(BootstrapMixin, forms.Form):
