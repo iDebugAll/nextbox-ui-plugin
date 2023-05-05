@@ -2,7 +2,7 @@
 
 from django.shortcuts import render
 from django.views.generic import View
-from dcim.models import Cable, Device, Interface, DeviceRole
+from dcim.models import Cable, Device, Interface, DeviceRole, PowerFeed
 from ipam.models import VLAN
 from .models import SavedTopology
 from . import forms, filters
@@ -315,8 +315,12 @@ def get_vlan_topology(nb_devices_qs, vlans):
 
                     topology_dict['links'].append({
                         'id': source_cable[1].id,
+                        'dcimCableURL': source_cable[1].get_absolute_url(),
+                        'label': f"Cable {source_cable[1].id}",
                         'source': source_cable[0].device.id,
                         'target': dest_cable[-1].device.id,
+                        'sourceDeviceName': source_cable[0].device.name,
+                        'targetDeviceName': dest_cable[-1].device.name,
                         "srcIfName": if_shortname(source_cable[0].name),
                         "tgtIfName": if_shortname(dest_cable[-1].name),
                         })
@@ -343,22 +347,42 @@ def get_topology(nb_devices_qs):
         tags = filter_tags(tags)
         for tag in tags:
             all_device_tags.add((tag, not tag_is_hidden(tag)))
-        links_from_device = Cable.objects.filter(_termination_a_device_id=nb_device.id)
-        links_to_device = Cable.objects.filter(_termination_b_device_id=nb_device.id)
-        if links_from_device:
-            # Device is considered passive if it has no linked Interfaces.
-            # Passive cabling devices use Rear and Front Ports.
-            for link in links_from_device:
-                if isinstance(link.termination_a, Interface) and link.termination_a.device.id == nb_device.id:
-                    break
-            else:
-                device_is_passive = True
-        if links_to_device:
-            for link in links_to_device:
-                if isinstance(link.termination_b, Interface) and link.termination_b.device.id == nb_device.id:
-                    break
-            else:
-                device_is_passive = True
+        # Device is considered passive if it has no linked Interfaces.
+        # Passive cabling devices use Rear and Front Ports.
+        if NETBOX_CURRENT_VERSION < version.parse("3.3"):
+            links_from_device = Cable.objects.filter(_termination_a_device_id=nb_device.id)
+            links_to_device = Cable.objects.filter(_termination_b_device_id=nb_device.id)
+            if links_from_device:
+                for link in links_from_device:
+                    if isinstance(link.termination_a, Interface) and link.termination_a.device.id == nb_device.id:
+                        break
+                else:
+                    device_is_passive = True
+            if links_to_device:
+                for link in links_to_device:
+                    if isinstance(link.termination_b, Interface) and link.termination_b.device.id == nb_device.id:
+                        break
+                else:
+                    device_is_passive = True
+        else:
+            links_from_device = Cable.objects.filter(terminations__cable_end='A', terminations___device_id=nb_device.id)
+            links_to_device = Cable.objects.filter(terminations__cable_end='B', terminations___device_id=nb_device.id)
+            interfaces_found = False
+            if links_from_device:
+                for link in links_from_device:
+                    for ab_link in link.a_terminations + link.b_terminations:
+                        if isinstance(ab_link, Interface) and ab_link.device.id == nb_device.id:
+                            interfaces_found = True
+                            break
+            if links_to_device:
+                for link in links_to_device:
+                    for ab_link in link.a_terminations + link.b_terminations:
+                        if isinstance(ab_link, Interface) and ab_link.device.id == nb_device.id:
+                            interfaces_found = True
+                            break
+            if links_to_device or links_from_device:
+                device_is_passive = not interfaces_found
+
         topology_dict['nodes'].append({
             'id': nb_device.id,
             'name': nb_device.name,
@@ -381,13 +405,18 @@ def get_topology(nb_devices_qs):
         if not links_from_device:
             continue
         for link in links_from_device:
+            # Exclude PowerFeed-connected links
+            if (isinstance(link.a_terminations[0], PowerFeed) or (isinstance(link.b_terminations[0], PowerFeed))):
+                continue
+
             # Include links to discovered devices only
-            if link._termination_b_device_id in device_ids:
+            if link.b_terminations[0].device_id in device_ids:
                 if (
                     link.termination_a.name.lower() not in UNDISPLAYED_INTERFACE_NAMES
                     and link.termination_b.name.lower() not in UNDISPLAYED_INTERFACE_NAMES
                 ):
                     links.append(link)
+
     device_roles = list(device_roles)
     device_roles.sort(key=lambda i: get_node_layer_sort_preference(i[0]))
     all_device_tags = list(all_device_tags)
@@ -397,10 +426,18 @@ def get_topology(nb_devices_qs):
     link_ids = set()
     for link in links:
         link_ids.add(link.id)
+        link_url = link.get_absolute_url()
+        if NETBOX_CURRENT_VERSION > version.parse("3.3"):
+            link.termination_a = link.a_terminations[0]
+            link.termination_b = link.b_terminations[0]
         topology_dict['links'].append({
             'id': link.id,
+            'label': f"Cable {link.id}",
+            'dcimCableURL': link_url,
             'source': link.termination_a.device.id,
             'target': link.termination_b.device.id,
+            'sourceDeviceName': link.termination_a.device.name,
+            'targetDeviceName': link.termination_b.device.name,
             "srcIfName": if_shortname(link.termination_a.name),
             "tgtIfName": if_shortname(link.termination_b.name)
         })
