@@ -412,8 +412,8 @@ def get_topology(nb_devices_qs):
             # Include links to discovered devices only
             if link.b_terminations[0].device_id in device_ids:
                 if (
-                    link.termination_a.name.lower() not in UNDISPLAYED_INTERFACE_NAMES
-                    and link.termination_b.name.lower() not in UNDISPLAYED_INTERFACE_NAMES
+                    link.a_terminations[0].name.lower() not in UNDISPLAYED_INTERFACE_NAMES
+                    and link.b_terminations[0].name.lower() not in UNDISPLAYED_INTERFACE_NAMES
                 ):
                     links.append(link)
 
