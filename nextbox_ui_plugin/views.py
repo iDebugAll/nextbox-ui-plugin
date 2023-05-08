@@ -4,6 +4,7 @@ from django.shortcuts import render
 from django.views.generic import View
 from dcim.models import Cable, Device, Interface, DeviceRole, PowerFeed
 from ipam.models import VLAN
+from circuits.models import CircuitTermination
 from .models import SavedTopology
 from . import forms, filters
 from django.contrib.auth.mixins import PermissionRequiredMixin
@@ -403,6 +404,9 @@ def get_topology(nb_devices_qs):
             else:
                 # Exclude PowerFeed-connected links
                 if (isinstance(link.a_terminations[0], PowerFeed) or (isinstance(link.b_terminations[0], PowerFeed))):
+                    continue
+                # Exclude CircuitTermination-connected links
+                if (isinstance(link.a_terminations[0], CircuitTermination) or (isinstance(link.b_terminations[0], CircuitTermination))):
                     continue
                 # Include links to discovered devices only
                 if link.b_terminations[0].device_id in device_ids:
