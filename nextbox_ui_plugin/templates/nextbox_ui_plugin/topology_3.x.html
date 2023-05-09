@@ -36,6 +36,18 @@
 </ul>
 
 <div class="tab-content">
+    {% if has_update %}
+    <div class="alert alert-info" role="alert">
+        Update available! Do you want to update topology?
+        <form action="." method="get">
+            <select name='saved_topology_id' hidden>
+                <option value="{{ requestGET.saved_topology_id|first }}" selected hidden></option>
+            </select>
+            <input type="checkbox" name="has_update" checked hidden>
+        <button class="btn btn-primary pull-right" type="submit">Update</button>
+            </form>
+    </div>
+        {% endif %}
     <div class="tab-pane active" id="topology" role="tabpanel" aria-labelledby="topology-tab">
 
         <div>
@@ -148,6 +160,7 @@
     var requestGET = {{ requestGET|safe }};
     var netbox_csrf_token = '{{ csrf_token }}'
     var topoSaveURI = '{% url 'plugins-api:nextbox_ui_plugin-api:savedtopology-list' %}';
+    var initialFilters = {{ initial_filters|safe }};
     console.log(topologyData);
 </script>
 <script src="{% static 'nextbox_ui_plugin/next_app.js' %}"></script>
