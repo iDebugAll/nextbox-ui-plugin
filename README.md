@@ -234,7 +234,7 @@ Download the Plugin and build from the source:
 ```
 $ git clone https://github.com/iDebugAll/nextbox-ui-plugin
 $ cd nextbox-ui-plugin
-$ docker build -t netbox-custom .
+$ DOCKER_BUILDKIT=1 docker build -t netbox-custom .
 ```
 Update a netbox image name in **docker-compose.yml** in a Netbox Community Docker project root:
 ```yaml
