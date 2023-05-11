@@ -230,17 +230,11 @@ sudo systemctl restart netbox
 # Installation with Docker
 The Plugin may be installed in a Netbox Docker deployment. 
 The package contains a Dockerfile for [Netbox-Community Docker](https://github.com/netbox-community/netbox-docker) extension. Latest-LDAP version is used by default as a source.<br/>
-Download the Plugin and build from the source:
-```
-$ git clone https://github.com/iDebugAll/nextbox-ui-plugin
-$ cd nextbox-ui-plugin
-$ docker build -t netbox-custom .
-```
 Update a netbox image name in **docker-compose.yml** in a Netbox Community Docker project root:
 ```yaml
 services:
   netbox: &netbox
-    image: netbox-custom:latest
+    image: ghcr.io/idebugall/nextbox-ui-plugin:latest
 ```
 Update a **configuration.py**. It is stored in netbox-docker/configuration/ by default. Update or add PLUGINS parameter and PLUGINS_CONFIG parameter as described above.
 
