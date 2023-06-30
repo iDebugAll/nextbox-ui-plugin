@@ -58,17 +58,10 @@
             linkType: 'curve',
             sourcelabel: 'model.srcIfName',
             targetlabel: 'model.tgtIfName',
+            color: 'model.color',
             style: function(model) {
                 if (model._data.is_dead === 'yes') {
                     return { 'stroke-dasharray': '5' }
-                }
-            },
-            color: function(model) {
-                if (model._data.is_dead === 'yes') {
-                    return '#E40039'
-                }
-                if (model._data.is_new === 'yes') {
-                    return '#148D09'
                 }
             },
         },
@@ -317,13 +310,15 @@
                 var line = this.line();
                 var angle = line.angle();
                 var stageScale = this.stageScale();
+                var _offset = this.getOffset();
+                var n = line.normal().multiply(_offset);
                 
                 // pad line
                 line = line.pad(18 * stageScale, 18 * stageScale);
                 
                 if (this.sourcelabel()) {
                     el = this.view('source');
-                    point = line.start;
+                    point = line.start.add(n);
                     el.set('x', point.x);
                     el.set('y', point.y);
                     el.set('text', this.sourcelabel());
@@ -334,7 +329,7 @@
                 
                 if (this.targetlabel()) {
                     el = this.view('target');
-                    point = line.end;
+                    point = line.end.subtract(n);
                     el.set('x', point.x);
                     el.set('y', point.y);
                     el.set('text', this.targetlabel());

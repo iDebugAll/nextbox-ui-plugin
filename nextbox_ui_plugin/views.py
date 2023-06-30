@@ -305,6 +305,11 @@ def get_vlan_topology(nb_devices_qs, vlans):
                 if (mapping_link not in mapped_links) and (mapping_link.reverse() not in mapped_links):
                     mapped_links.append(mapping_link)
 
+                    if source_cable[0].color == "":
+                        color = '#6AC6E2'
+                    else:
+                        color = f"#{source_cable[0].color}"
+                    
                     topology_dict['links'].append({
                         'id': source_cable[1].id,
                         'dcimCableURL': source_cable[1].get_absolute_url(),
@@ -313,6 +318,7 @@ def get_vlan_topology(nb_devices_qs, vlans):
                         'target': dest_cable[-1].device.id,
                         'sourceDeviceName': source_cable[0].device.name,
                         'targetDeviceName': dest_cable[-1].device.name,
+                        'color': color,
                         "srcIfName": if_shortname(source_cable[0].name),
                         "tgtIfName": if_shortname(dest_cable[-1].name),
                         })
@@ -425,6 +431,12 @@ def get_topology(nb_devices_qs):
         if NETBOX_CURRENT_VERSION > version.parse("3.3"):
             link.termination_a = link.a_terminations[0]
             link.termination_b = link.b_terminations[0]
+
+        if link.color == "":
+            color = '#6AC6E2'
+        else:
+            color = f"#{link.color}"
+        
         topology_dict['links'].append({
             'id': link.id,
             'label': f"Cable {link.id}",
@@ -433,6 +445,7 @@ def get_topology(nb_devices_qs):
             'target': link.termination_b.device.id,
             'sourceDeviceName': link.termination_a.device.name,
             'targetDeviceName': link.termination_b.device.name,
+            'color': color,
             "srcIfName": if_shortname(link.termination_a.name),
             "tgtIfName": if_shortname(link.termination_b.name)
         })
@@ -462,10 +475,17 @@ def get_topology(nb_devices_qs):
     for cable_path in multi_cable_connections:
         link_id = max(link_ids) + 1  # dummy ID for a logical link
         link_ids.add(link_id)
+        
+        if cable_path[0][0].color == "":
+            color = '#6AC6E2'
+        else:
+            color = f"#{cable_path[0][0].color}"
+        
         topology_dict['links'].append({
             'id': link_id,
             'source': cable_path[0][0].device.id,
             'target': cable_path[-1][2].device.id,
+            'color': color,
             "srcIfName": if_shortname(cable_path[0][0].name),
             "tgtIfName": if_shortname(cable_path[-1][2].name),
             "isLogicalMultiCable": True,
