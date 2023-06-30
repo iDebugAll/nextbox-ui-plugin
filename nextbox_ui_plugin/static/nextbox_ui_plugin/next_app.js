@@ -58,17 +58,10 @@
             linkType: 'curve',
             sourcelabel: 'model.srcIfName',
             targetlabel: 'model.tgtIfName',
+            color: 'model.color',
             style: function(model) {
                 if (model._data.is_dead === 'yes') {
                     return { 'stroke-dasharray': '5' }
-                }
-            },
-            color: function(model) {
-                if (model._data.is_dead === 'yes') {
-                    return '#E40039'
-                }
-                if (model._data.is_new === 'yes') {
-                    return '#148D09'
                 }
             },
         },
