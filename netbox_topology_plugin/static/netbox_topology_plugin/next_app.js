@@ -454,7 +454,8 @@
         $.ajax({
             type: 'POST',
             url: topoSaveURI,
-            data: {
+            contentType : 'application/json',
+            data: JSON.stringify({
                 'name': topoSaveName,
                 'topology': JSON.stringify(topo.data()),
                 'layout_context': JSON.stringify({
@@ -466,7 +467,7 @@
                     'displayLogicalMultiCableLinks': displayLogicalMultiCableLinks,
                     'requestGET': requestGET,
                 })
-            },
+            }),
             headers: {'X-CSRFToken': CSRFToken},
             success: function (response) {
                 saveResultLabel.innerHTML = 'Success';
