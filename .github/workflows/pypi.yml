@@ -25,7 +25,7 @@ jobs:
         pip install --upgrade setuptools wheel build
     - name: Build
       run: |
-        python build
+        python -m build
     - name: Publish package to TestPyPI
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
