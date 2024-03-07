@@ -112,7 +112,7 @@ DEFAULT_ICON_ROLE_MAP = {
 }
 
 
-PLUGIN_SETTINGS = settings.PLUGINS_CONFIG.get("nextbox_ui_plugin", dict())
+PLUGIN_SETTINGS = settings.PLUGINS_CONFIG.get("netbox_topology_plugin", dict())
 
 MANUAL_LAYERS_SORT_ORDER = PLUGIN_SETTINGS.get("layers_sort_order", "")
 LAYERS_SORT_ORDER = MANUAL_LAYERS_SORT_ORDER or DEFAULT_LAYERS_SORT_ORDER
@@ -513,9 +513,9 @@ class TopologyView(PermissionRequiredMixin, View):
     queryset = Device.objects.all()
     filterset = filters.TopologyFilterSet
     if NETBOX_CURRENT_VERSION >= version.parse("3.0"):
-        template_name = 'nextbox_ui_plugin/topology_3.x.html'
+        template_name = 'netbox_topology_plugin/topology_3.x.html'
     else:
-        template_name = 'nextbox_ui_plugin/topology.html'
+        template_name = 'netbox_topology_plugin/topology.html'
 
     def get(self, request):
 
@@ -570,6 +570,6 @@ class TopologyView(PermissionRequiredMixin, View):
 
 class SiteTopologyView(TopologyView):
     if NETBOX_CURRENT_VERSION >= version.parse("3.0"):
-        template_name = 'nextbox_ui_plugin/site_topology_3.x.html'
+        template_name = 'netbox_topology_plugin/site_topology_3.x.html'
     else:
-        template_name = 'nextbox_ui_plugin/site_topology.html'
+        template_name = 'netbox_topology_plugin/site_topology.html'

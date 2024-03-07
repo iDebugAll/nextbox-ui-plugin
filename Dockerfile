@@ -5,9 +5,9 @@ FROM ${FROM}
 
 ENV VIRTUAL_ENV=/opt/netbox/venv
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
-COPY ./nextbox_ui_plugin /source/nextbox-ui-plugin/nextbox_ui_plugin/
-COPY ./setup.py /source/nextbox-ui-plugin/
-COPY ./MANIFEST.in /source/nextbox-ui-plugin/
-COPY ./README.md /source/nextbox-ui-plugin/
-COPY --chown=1000:1000 --chmod=644 ./nextbox_ui_plugin/static/nextbox_ui_plugin /opt/netbox/netbox/static/nextbox_ui_plugin
-RUN pip3 install --no-cache-dir nextbox-ui-plugin
+COPY netbox_topology_plugin /source/netbox-topology-plugin/netbox_topology_plugin/
+COPY ./setup.py /source/netbox-topology-plugin/
+COPY ./MANIFEST.in /source/netbox-topology-plugin/
+COPY ./README.md /source/netbox-topology-plugin/
+COPY --chown=1000:1000 --chmod=644 netbox_topology_plugin/static/netbox_topology_plugin /opt/netbox/netbox/static/netbox_topology_plugin
+RUN pip3 install --no-cache-dir netbox-topology-plugin

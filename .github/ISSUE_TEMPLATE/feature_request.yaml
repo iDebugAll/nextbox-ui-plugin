@@ -1,0 +1,44 @@
+---
+name: ✨ Feature Request
+description: Propose a new Plugin feature or enhancement
+labels: ["type: feature"]
+body:
+  - type: input
+    attributes:
+      label: Plugin version
+      description: What version of the plugin are you currently running?
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: NetBox version
+      description: What version of NetBox are you currently running?
+    validations:
+      required: true
+  - type: dropdown
+    attributes:
+      label: Feature type
+      options:
+        - Data model extension
+        - New functionality
+        - Change to existing functionality
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Proposed functionality
+      description: >
+        Describe in detail the new feature or behavior you are proposing. Include any specific changes
+        to work flows, data models, and/or the user interface. The more detail you provide here, the
+        greater chance your proposal has of being discussed. Feature requests which don't include an
+        actionable implementation plan will be rejected.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: External dependencies
+      description: >
+        List any new dependencies on external libraries or services that this new feature would
+        introduce. For example, does the proposal require the installation of a new Python package?
+        (Not all new features introduce new dependencies.)

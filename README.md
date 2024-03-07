@@ -1,4 +1,4 @@
-# NextBox UI Plugin
+# NetBox Topology Plugin
 
 A topology visualization plugin for [NetBox](https://github.com/netbox-community/netbox) powered by [NextUI](https://developer.cisco.com/site/neXt/) Toolkit. Netbox v2.8.0+ is required.
 
@@ -11,37 +11,37 @@ General installation steps and considerations follow the [official guidelines](h
 Assuming you use a Virtual Environment for Netbox:
 ```
 $ source /opt/netbox/venv/bin/activate
-(venv) $ pip3 install nextbox-ui-plugin
+(venv) $ pip3 install netbox-topology-plugin-plugin
 ```
 
 ### Package Installation from Source Code
-The source code is available on [GitHub](https://github.com/iDebugAll/nextbox-ui-plugin).<br/>
+The source code is available on [GitHub](https://github.com/DanSheps/netbox-topology-plugin-plugin).<br/>
 Download and install the package. Assuming you use a Virtual Environment for Netbox:
 ```
-$ git clone https://github.com/iDebugAll/nextbox-ui-plugin
-$ cd nextbox-ui-plugin
+$ git clone https://github.com/DanSheps/netbox-topology-plugin-plugin
+$ cd netbox-topology-plugin-plugin
 $ source /opt/netbox/venv/bin/activate
 (venv) $ pip3 install .
 ```
 
-To ensure NextBox UI plugin is automatically re-installed during future upgrades, create a file named `local_requirements.txt` (if not already existing) in the NetBox root directory (alongside `requirements.txt`) and list the `nextbox-ui-plugin` package:
+To ensure NetBox Topology plugin is automatically re-installed during future upgrades, create a file named `local_requirements.txt` (if not already existing) in the NetBox root directory (alongside `requirements.txt`) and list the `netbox-topology-plugin-plugin` package:
 
 ```no-highlight
-# echo nextbox-ui-plugin >> local_requirements.txt
+# echo netbox-topology-plugin-plugin >> local_requirements.txt
 ```
 
 ### Enable the Plugin
 In a global Netbox **configuration.py** configuration file, update or add PLUGINS parameter:
 ```python
 PLUGINS = [
-    'nextbox_ui_plugin',
+    'netbox_topology_plugin',
 ]
 ```
 
 Optionally, update a PLUGINS_CONFIG parameter in **configuration.py** to rewrite default plugin behavior:
 ```python
 #PLUGINS_CONFIG = {
-#    'nextbox_ui_plugin': {
+#    'netbox_topology_plugin': {
 #        'layers_sort_order': (
 #            ADD YOUR SETTINGS HERE
 #            layer_sort_order is a tuple
@@ -232,8 +232,8 @@ The Plugin may be installed in a Netbox Docker deployment.
 The package contains a Dockerfile for [Netbox-Community Docker](https://github.com/netbox-community/netbox-docker) extension. Latest-LDAP version is used by default as a source.<br/>
 Download the Plugin and build from the source:
 ```
-$ git clone https://github.com/iDebugAll/nextbox-ui-plugin
-$ cd nextbox-ui-plugin
+$ git clone https://github.com/DanSheps/netbox-topology-plugin-plugin
+$ cd netbox-topology-plugin-plugin
 $ docker build -t netbox-custom .
 ```
 Update a netbox image name in **docker-compose.yml** in a Netbox Community Docker project root:
@@ -274,7 +274,7 @@ Nodes are draggable and clickable:
 ![](samples/sample_node_tooltip_content.png)<br/>
 You can switch between vertical and horizontal layers sort order back and forth. Default is vertical.<br/>
 
-2. Using Plugins dropdown menu item: *Plugins -> NextBox UI -> Topology Viewer*.<br/>
+2. Using Plugins dropdown menu item: *Plugins -> NetBox Topology -> Topology Viewer*.<br/>
 Use Search form controls to pick desired Sites, Regions, or Devices.<br/>
 ![](samples/sample_topology_viewer_page01.png)
 <br/>

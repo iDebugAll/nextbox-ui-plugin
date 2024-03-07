@@ -3,9 +3,9 @@
 {% load static %}
 
 {% block header %}
-<script src="{% static 'nextbox_ui_plugin/next_sources/js/next.js' %}"></script>
-<link rel="stylesheet"href="{% static 'nextbox_ui_plugin/next_sources/css/next.css' %}">
-<script src="{% static 'nextbox_ui_plugin/button_utils.js' %}"></script>
+<script src="{% static 'netbox_topology_plugin/next_sources/js/next.js' %}"></script>
+<link rel="stylesheet"href="{% static 'netbox_topology_plugin/next_sources/css/next.css' %}">
+<script src="{% static 'netbox_topology_plugin/button_utils.js' %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -121,10 +121,10 @@
     var topologySavedData = {{ source_data|safe }};
     var initialLayout = '{{ initial_layout|safe }}';
     var requestGET = {{ requestGET|safe }};
-    var topoSaveURI = '{% url 'plugins-api:nextbox_ui_plugin-api:savedtopology-list' %}';
+    var topoSaveURI = '{% url 'plugins-api:netbox_topology_plugin-api:savedtopology-list' %}';
     console.log(topologyData);
 </script>
-<script src="{% static 'nextbox_ui_plugin/next_app.js' %}"></script>
+<script src="{% static 'netbox_topology_plugin/next_app.js' %}"></script>
 
 <script type="text/javascript">
     showHideUndonnectedButtonInitial();

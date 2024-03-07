@@ -1,6 +1,7 @@
-from extras.plugins import PluginTemplateExtension
 from django.conf import settings
 from packaging import version
+
+from netbox.plugins import PluginTemplateExtension
 
 NETBOX_CURRENT_VERSION = version.parse(settings.VERSION)
 
@@ -13,9 +14,9 @@ class SiteTopologyButtons(PluginTemplateExtension):
 
     def buttons(self):
         if NETBOX_CURRENT_VERSION >= version.parse("3.0"):
-            return self.render('nextbox_ui_plugin/site_topo_button_3.x.html')
+            return self.render('netbox_topology_plugin/site_topo_button_3.x.html')
         else:
-            return self.render('nextbox_ui_plugin/site_topo_button.html')
+            return self.render('netbox_topology_plugin/site_topo_button.html')
 
 
 # PluginTemplateExtension subclasses must be packaged into an iterable named

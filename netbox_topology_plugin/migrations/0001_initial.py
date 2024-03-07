@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
                 ('topology', models.JSONField()),
                 ('layout_context', models.JSONField(blank=True, null=True)),
                 ('timestamp', models.DateTimeField()),
-                ('created_by', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='users.adminuser')),
+                ('created_by', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='users.netboxuser')),
             ],
         ),
     ]

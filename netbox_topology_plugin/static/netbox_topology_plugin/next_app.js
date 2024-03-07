@@ -77,7 +77,7 @@
         linkInstanceClass: 'CustomLinkClass'
     });
     
-    topo.registerIcon("dead_node", "/static/nextbox_ui_plugin/img/dead_node.png", 49, 49);
+    topo.registerIcon("dead_node", "/static/netbox_topology_plugin/img/dead_node.png", 49, 49);
     
     var Shell = nx.define(nx.ui.Application, {
         methods: {

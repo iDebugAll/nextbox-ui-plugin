@@ -8,9 +8,9 @@
         <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="btn btn-sm btn-danger" data-bs-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h2 class="modal-title" style="text-align: center;width:100%;"><a href={% url 'plugins:nextbox_ui_plugin:topology' %}?site_id={{ object.id }}>{{ object.name }} Topology</a></h2>
+                    <h2 class="modal-title" style="text-align: center;width:100%;"><a href={% url 'plugins:netbox_topology_plugin:topology' %}?site_id={{ object.id }}>{{ object.name }} Topology</a></h2>
                 </div>
-        <iframe src="{% url 'plugins:nextbox_ui_plugin:site_topology' %}?site_id={{ object.id }}" style="height: 75vh; width: 100%;"></iframe>
+        <iframe src="{% url 'plugins:netbox_topology_plugin:site_topology' %}?site_id={{ object.id }}" style="height: 75vh; width: 100%;"></iframe>
         </div>
     </div>
 </div>

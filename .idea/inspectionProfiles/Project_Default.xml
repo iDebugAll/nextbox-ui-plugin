@@ -1,0 +1,29 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="Eslint" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredPackages">
+        <value>
+          <list size="15">
+            <item index="0" class="java.lang.String" itemvalue="mkdocs-material" />
+            <item index="1" class="java.lang.String" itemvalue="psycopg2-binary" />
+            <item index="2" class="java.lang.String" itemvalue="tzdata" />
+            <item index="3" class="java.lang.String" itemvalue="mkdocstrings" />
+            <item index="4" class="java.lang.String" itemvalue="django-debug-toolbar" />
+            <item index="5" class="java.lang.String" itemvalue="dulwich" />
+            <item index="6" class="java.lang.String" itemvalue="social-auth-core" />
+            <item index="7" class="java.lang.String" itemvalue="boto3" />
+            <item index="8" class="java.lang.String" itemvalue="drf-spectacular" />
+            <item index="9" class="java.lang.String" itemvalue="social-auth-app-django" />
+            <item index="10" class="java.lang.String" itemvalue="sentry-sdk" />
+            <item index="11" class="java.lang.String" itemvalue="Django" />
+            <item index="12" class="java.lang.String" itemvalue="bleach" />
+            <item index="13" class="java.lang.String" itemvalue="django-rq" />
+            <item index="14" class="java.lang.String" itemvalue="Pillow" />
+          </list>
+        </value>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>

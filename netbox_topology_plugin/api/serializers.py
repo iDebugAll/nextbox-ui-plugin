@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from nextbox_ui_plugin.models import SavedTopology
+from netbox_topology_plugin.models import SavedTopology
 import datetime
 import json
 

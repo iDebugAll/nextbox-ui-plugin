@@ -1,4 +1,5 @@
 from django.db import models
+
 from utilities.querysets import RestrictedQuerySet
 
 
@@ -8,7 +9,7 @@ class SavedTopology(models.Model):
     topology = models.JSONField()
     layout_context = models.JSONField(null=True, blank=True)
     created_by = models.ForeignKey(
-        to="users.AdminUser",
+        to="users.NetBoxUser",
         on_delete=models.CASCADE,
         blank=False,
         null=False,

@@ -1,0 +1,6 @@
+# Reference: https://help.github.com/en/github/building-a-strong-community/configuring-issue-templates-for-your-repository#configuring-the-template-chooser
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Community Slack
+    url: https://netdev.chat/
+    about: "Join #netbox on the NetDev Community Slack for assistance with installation issues and other problems"
