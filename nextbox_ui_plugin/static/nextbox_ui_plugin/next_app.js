@@ -451,22 +451,24 @@
         var saveResultLabel = document.getElementById('saveResult');
         saveButton.setAttribute('disabled', true);
         saveResultLabel.setAttribute('innerHTML', 'Processing');
+        var topoData = {
+            'name': topoSaveName,
+            'topology': JSON.stringify(topo.data()),
+            'layout_context': JSON.stringify({
+                'initialLayout': initialLayout,
+                'displayUnconnected': !displayUnconnected,
+                'undisplayedRoles': undisplayedRoles,
+                'undisplayedDeviceTags': undisplayedDeviceTags,
+                'displayPassiveDevices': !displayPassiveDevices,
+                'displayLogicalMultiCableLinks': displayLogicalMultiCableLinks,
+                'requestGET': requestGET,
+            })
+        }
         $.ajax({
             type: 'POST',
             url: topoSaveURI,
-            data: {
-                'name': topoSaveName,
-                'topology': JSON.stringify(topo.data()),
-                'layout_context': JSON.stringify({
-                    'initialLayout': initialLayout,
-                    'displayUnconnected': !displayUnconnected,
-                    'undisplayedRoles': undisplayedRoles,
-                    'undisplayedDeviceTags': undisplayedDeviceTags,
-                    'displayPassiveDevices': !displayPassiveDevices,
-                    'displayLogicalMultiCableLinks': displayLogicalMultiCableLinks,
-                    'requestGET': requestGET,
-                })
-            },
+            data: JSON.stringify(topoData),
+            contentType: "application/json; charset=utf-8",
             headers: {'X-CSRFToken': CSRFToken},
             success: function (response) {
                 saveResultLabel.innerHTML = 'Success';
