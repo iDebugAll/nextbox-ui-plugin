@@ -1,6 +1,15 @@
 from django.db import models
 from utilities.querysets import RestrictedQuerySet
+from django.conf import settings
+from packaging import version
 
+NETBOX_CURRENT_VERSION = version.parse(settings.VERSION)
+
+def get_user_model():
+    if NETBOX_CURRENT_VERSION >= version.parse("4.0.0"):
+        return 'users.User'
+    else:
+        return 'users.NetBoxUser'
 
 class SavedTopology(models.Model):
 
@@ -8,7 +17,7 @@ class SavedTopology(models.Model):
     topology = models.JSONField()
     layout_context = models.JSONField(null=True, blank=True)
     created_by = models.ForeignKey(
-        to="users.NetBoxUser",
+        to=get_user_model(),
         on_delete=models.CASCADE,
         blank=False,
         null=False,
