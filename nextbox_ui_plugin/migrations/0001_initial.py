@@ -2,7 +2,49 @@
 
 from django.db import migrations, models
 import django.db.models.deletion
+import netbox
+from django.db import connection
+from django.conf import settings
+from packaging import version
 
+NETBOX_CURRENT_VERSION = version.parse(settings.VERSION)
+
+def get_user_model():
+    if NETBOX_CURRENT_VERSION >= version.parse("4.0.0"):
+        return 'users.User'
+    else:
+        return 'users.NetBoxUser'
+
+def update_foreign_key(apps, schema_editor):
+    if NETBOX_CURRENT_VERSION < version.parse("4.0.0"):
+        return
+    UserModel = get_user_model()
+    table_name = 'nextbox_ui_plugin_savedtopology'
+
+    with connection.cursor() as cursor:
+        # Check the existing ForeignKey reference
+        cursor.execute("""
+            SELECT conname AS constraint_name, conrelid::regclass AS table_name, a.attname AS column_name, 
+                   confrelid::regclass AS referenced_table_name, af.attname AS referenced_column_name
+            FROM pg_constraint AS c 
+            JOIN pg_attribute AS a ON a.attnum = ANY(c.conkey) 
+            JOIN pg_class AS cl ON cl.oid = c.conrelid 
+            JOIN pg_namespace AS ns ON ns.oid = cl.relnamespace 
+            JOIN pg_attribute AS af ON af.attnum = ANY(c.confkey) 
+            WHERE ns.nspname = 'public' AND cl.relname = %s AND a.attname = 'created_by_id' AND c.contype = 'f';
+        """, [table_name])
+        row = cursor.fetchone()
+
+        if row and row[3] != UserModel.split('.')[1].lower():
+            # Drop the existing ForeignKey constraint
+            cursor.execute(f"ALTER TABLE {table_name} DROP CONSTRAINT {row[0]}")
+
+            # Add the new ForeignKey constraint
+            cursor.execute(f"""
+                ALTER TABLE {table_name}
+                ADD CONSTRAINT {row[0]}
+                FOREIGN KEY (created_by_id) REFERENCES {UserModel.split('.')[0]}({UserModel.split('.')[1]});
+            """)
 
 class Migration(migrations.Migration):
 
@@ -21,7 +63,8 @@ class Migration(migrations.Migration):
                 ('topology', models.JSONField()),
                 ('layout_context', models.JSONField(blank=True, null=True)),
                 ('timestamp', models.DateTimeField()),
-                ('created_by', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='users.netboxuser')),
+                ('created_by', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=get_user_model())),
             ],
         ),
+        migrations.RunPython(update_foreign_key),
     ]

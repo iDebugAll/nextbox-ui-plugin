@@ -15,21 +15,24 @@ else:
 if NETBOX_CURRENT_VERSION >= version.parse("3.0") :
     from django.utils.translation import gettext as _
 
-if NETBOX_CURRENT_VERSION < version.parse("3.5"):
+if NETBOX_CURRENT_VERSION >= version.parse("4.0"):
+    from utilities.forms.fields import (
+        DynamicModelMultipleChoiceField,
+        DynamicModelChoiceField
+    )
+elif NETBOX_CURRENT_VERSION < version.parse("3.5"):
     from utilities.forms import (
-        BootstrapMixin,
         DynamicModelMultipleChoiceField,
         DynamicModelChoiceField
     )
 else:
-    from utilities.forms import BootstrapMixin
     from utilities.forms.fields import (
         DynamicModelMultipleChoiceField,
         DynamicModelChoiceField
     )
 
 
-class TopologyFilterForm(BootstrapMixin, forms.Form):
+class TopologyFilterForm(forms.Form):
 
     model = Device
 
@@ -71,7 +74,7 @@ class TopologyFilterForm(BootstrapMixin, forms.Form):
         region_id.label = _('Regions')
 
 
-class LoadSavedTopologyFilterForm(BootstrapMixin, forms.Form):
+class LoadSavedTopologyFilterForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)

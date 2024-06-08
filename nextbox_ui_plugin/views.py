@@ -184,6 +184,10 @@ def get_icon_type(device_id):
     4. Default 'undefined'
     """
     nb_device = Device.objects.get(id=device_id)
+    if NETBOX_CURRENT_VERSION >= version.parse("4.0.0"):
+        device_role_obj = nb_device.role
+    else:
+        device_role_obj = nb_device.device_role
     if not nb_device:
         return 'unknown'
     for tag in nb_device.tags.names():
@@ -194,7 +198,7 @@ def get_icon_type(device_id):
         if model_base in str(nb_device.device_type.model):
             return icon_type
     for role_slug, icon_type in ICON_ROLE_MAP.items():
-        if str(nb_device.device_role.slug) == role_slug:
+        if str(device_role_obj.slug) == role_slug:
             return icon_type
     return 'unknown'
 
@@ -268,6 +272,10 @@ def get_vlan_topology(nb_devices_qs, vlans):
     for device in devices:
         device_is_passive = False
         device_url = device.get_absolute_url()
+        if NETBOX_CURRENT_VERSION >= version.parse("4.0.0"):
+            device_role_obj = device.role
+        else:
+            device_role_obj = device.device_role
         primary_ip = ''
         if device.primary_ip:
             primary_ip = str(device.primary_ip.address)
@@ -281,9 +289,9 @@ def get_vlan_topology(nb_devices_qs, vlans):
             'primaryIP': primary_ip,
             'serial_number': device.serial,
             'model': device.device_type.model,
-            'deviceRole': device.device_role.slug,
+            'deviceRole': device_role_obj.slug,
             'layerSortPreference': get_node_layer_sort_preference(
-                device.device_role.slug
+                device_role_obj.slug
                 ),
             'icon': get_icon_type(
                 device.id
@@ -291,8 +299,8 @@ def get_vlan_topology(nb_devices_qs, vlans):
             'isPassive': device_is_passive,
             'tags': tags,
             })
-        is_visible = not (device.device_role.slug in UNDISPLAYED_DEVICE_ROLE_SLUGS)
-        device_roles.add((device.device_role.slug, device.device_role.name, is_visible))
+        is_visible = not (device_role_obj.slug in UNDISPLAYED_DEVICE_ROLE_SLUGS)
+        device_roles.add((device_role_obj.slug, device_role_obj.name, is_visible))
     
     mapped_links = []
     for interface in filtred_interfaces:
@@ -333,6 +341,10 @@ def get_topology(nb_devices_qs):
         device_is_passive = False
         device_url = nb_device.get_absolute_url()
         primary_ip = ''
+        if NETBOX_CURRENT_VERSION >= version.parse("4.0.0"):
+            device_role_obj = nb_device.role
+        else:
+            device_role_obj = nb_device.device_role
         if nb_device.primary_ip:
             primary_ip = str(nb_device.primary_ip.address)
         tags = [str(tag) for tag in nb_device.tags.names()] or []
@@ -382,9 +394,9 @@ def get_topology(nb_devices_qs):
             'primaryIP': primary_ip,
             'serial_number': nb_device.serial,
             'model': nb_device.device_type.model,
-            'deviceRole': nb_device.device_role.slug,
+            'deviceRole': device_role_obj.slug,
             'layerSortPreference': get_node_layer_sort_preference(
-                nb_device.device_role.slug
+                device_role_obj.slug
             ),
             'icon': get_icon_type(
                 nb_device.id
@@ -392,8 +404,8 @@ def get_topology(nb_devices_qs):
             'isPassive': device_is_passive,
             'tags': tags,
         })
-        is_visible = not (nb_device.device_role.slug in UNDISPLAYED_DEVICE_ROLE_SLUGS)
-        device_roles.add((nb_device.device_role.slug, nb_device.device_role.name, is_visible))
+        is_visible = not (device_role_obj.slug in UNDISPLAYED_DEVICE_ROLE_SLUGS)
+        device_roles.add((device_role_obj.slug, device_role_obj.name, is_visible))
         if not links_from_device:
             continue
         for link in links_from_device:
