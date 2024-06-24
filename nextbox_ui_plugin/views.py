@@ -467,19 +467,20 @@ def get_topology(nb_devices_qs):
         # identify segmented cable paths between end-devices
         if len(cable_path) < 2:
             continue
-        if isinstance(cable_path[0][0], Interface) and isinstance(cable_path[-1][2], Interface):
-            if set([c[1] for c in cable_path]) in [set([c[1] for c in x]) for x in multi_cable_connections]:
-                continue
-            multi_cable_connections.append(cable_path)
+        if len(cable_path[0][0]) > 0 and len(cable_path[-1][2]) > 0:
+            if isinstance(cable_path[0][0][0], Interface) and isinstance(cable_path[-1][2][0], Interface):
+                if set([c[1][0] for c in cable_path]) in [set([c[1][0] for c in x]) for x in multi_cable_connections]:
+                    continue
+                multi_cable_connections.append(cable_path)
     for cable_path in multi_cable_connections:
         link_id = max(link_ids) + 1  # dummy ID for a logical link
         link_ids.add(link_id)
         topology_dict['links'].append({
             'id': link_id,
-            'source': cable_path[0][0].device.id,
-            'target': cable_path[-1][2].device.id,
-            "srcIfName": if_shortname(cable_path[0][0].name),
-            "tgtIfName": if_shortname(cable_path[-1][2].name),
+            'source': cable_path[0][0][0].device.id,
+            'target': cable_path[-1][2][0].device.id,
+            "srcIfName": if_shortname(cable_path[0][0][0].name),
+            "tgtIfName": if_shortname(cable_path[-1][2][0].name),
             "isLogicalMultiCable": True,
         })
     return topology_dict, device_roles, multi_cable_connections, all_device_tags

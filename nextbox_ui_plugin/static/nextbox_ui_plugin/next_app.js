@@ -428,7 +428,9 @@
     showHideLogicalMultiCableLinks = function() {
         topologyData['links'].forEach(function(link){
             if (link['isLogicalMultiCable']) {
-                topo.getLink(link['id']).visible(displayLogicalMultiCableLinks);
+                if (topo.getLink(link['id'])) {
+                    topo.getLink(link['id']).visible(displayLogicalMultiCableLinks);
+                };
             };
         });
         displayLogicalMultiCableLinks = !displayLogicalMultiCableLinks
