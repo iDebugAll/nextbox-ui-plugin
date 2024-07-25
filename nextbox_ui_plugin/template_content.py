@@ -4,6 +4,10 @@ from packaging import version
 
 NETBOX_CURRENT_VERSION = version.parse(settings.VERSION)
 
+if NETBOX_CURRENT_VERSION >= version.parse("4.0.0"):
+    from netbox.plugins import PluginConfig
+else:
+    from extras.plugins import PluginConfig
 
 class SiteTopologyButtons(PluginTemplateExtension):
     """
