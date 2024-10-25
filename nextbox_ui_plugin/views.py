@@ -148,8 +148,15 @@ SELECT_LAYERS_LIST_EXCLUDE_DEVICE_TAGS = PLUGIN_SETTINGS.get("select_layers_list
 
 # Defines the initial layer alignment direction on the view
 INITIAL_LAYOUT = PLUGIN_SETTINGS.get("INITIAL_LAYOUT", 'forceDirected')
-if INITIAL_LAYOUT not in ('layered', 'forceDirected'):
+
+if INITIAL_LAYOUT not in ('vertica', 'horizontal', 'layered', 'forceDirected', 'auto'):
     INITIAL_LAYOUT = 'forceDirected'
+
+# Translate from legacy options
+if INITIAL_LAYOUT == 'auto':
+    INITIAL_LAYOUT = 'forceDirected'
+elif INITIAL_LAYOUT in ('vertical', 'horizontal'):
+    INITIAL_LAYOUT = 'layered'
 
 
 def if_shortname(ifname):
