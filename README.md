@@ -1,6 +1,6 @@
 # NextBox UI Plugin
 
-A topology visualization plugin for [NetBox](https://github.com/netbox-community/netbox) powered by [NextUI](https://developer.cisco.com/site/neXt/) Toolkit. Netbox v2.8.0+ is required.
+NextBox UI is a Next Generation topology visualization plugin for [NetBox](https://github.com/netbox-community/netbox) powered by topoSphere SDK.
 
 # Installation
 
@@ -54,34 +54,7 @@ Optionally, update a PLUGINS_CONFIG parameter in **configuration.py** to rewrite
 #            ADD YOUR SETTINGS HERE
 #            icon_role_map is a dict
 #        }
-#        'undisplayed_device_role_slugs': (
-# #          ADD YOUR SETTINGS HERE
-#            undisplayed_device_role_slugs value is a list or a tuple
-#            Listed device role slugs are hidden on initial view load,
-#            you may then hide/display any layer with a control button.
-#        ),
-#        'undisplayed_device_tags': (
-#           ADD YOUR SETTINGS HERE
-#           undisplayed_device_tags value is a list or a tuple of regex strings.
-#           Devices with tags matching any of listed regular expressions are hidden
-#           on initial view load, you may then hide/display any layer with a control button.
-#        ),
-#        'select_layers_list_include_device_tags': (
-#           ADD YOUR SETTINGS HERE
-#           select_layers_list_include_device_tags value is a list or a tuple of regex strings.
-#           Use this parameter to control tags listed in Select Layers menu.
-#           If specified, it works as allow list.
-#        ),
-#        'select_layers_list_exclude_device_tags': (
-#           ADD YOUR SETTINGS HERE
-#           select_layers_list_exclude_device_tags value is a list or a tuple of regex strings.
-#           Use this parameter to control tags listed in Select Layers menu.
-#           If specified, it filters out matched tags from the list, except ones mathcing 'undisplayed_device_tags'.
-#        ),
-#        'DISPLAY_PASSIVE_DEVICES': True|False,
-#        'DISPLAY_LOGICAL_MULTICABLE_LINKS': True|False,
-#        'DISPLAY_UNCONNECTED': True|False,
-#        'INITIAL_LAYOUT': 'vertical'|'horizontal'|'auto'
+#        'INITIAL_LAYOUT': 'auto' # or 'layered'
 #    }
 #}
 ```
@@ -180,29 +153,12 @@ Default mapping already contains some general categories:
 }
 ```
 
-4. Default value is 'unknown' (renders as a question mark icon).
+4. Default value is 'unknown'.
 <br/><br/>
 
-The Plugin can control the visibility of the layers and/or specific nodes on the topology view.<br/>
-The visibility control is currently implemented for specific device roles, device tags, unconnected devices, and passive devices:<br/>
 
-  - Initial visibility behavior for specific device roles is controlled by 'undisplayed_device_role_slugs' plugin parameter. Listed device role slugs are hidden on initial view load, you may then hide/display any layer with a control button on the topology view page.<br/>
-
-  - Initial visibility behavior for specific device tags is controlled by 'undisplayed_device_tags' plugin parameter. Devices with tags matching listed tag regular expressions are hidden on initial view load, you may then hide/display any layer with a control button on the topology view page.<br/>
-  By default, the plugin lists all discovered device tags in Select Layers menu. You can use 'select_layers_list_include_device_tags' and 'select_layers_list_exclude_device_tags' plugin parameters to filter the included tags.<br/>
-  All three tag visibility control parameters are optional lists of regular expressions. Tags matching 'undisplayed_device_tags' are always listed in Select Layers menu. Empty or unset 'select_layers_list_include_device_tags' allows all discovered tags to be listed in Select layers menu. If set, 'select_layers_list_include_device_tags' works as an allow list for matched tags. 'select_layers_list_exclude_device_tags' filters out matched tags from the list, excpept for ones matching 'undisplayed_device_tags'.
-
-  - Initial visibility behavior for unconnected nodes is controlled by DISPLAY_UNCONNECTED boolean plugin parameter.<br/>
-  By default, unconnected nodes are being displayed. Set DISPLAY_UNCONNECTED to False to hide them on initial topology view load.<br/>
-  A separate 'Hide/Display Unconnected' button may then be used to hide or display those nodes.
-
-  - Initial visibility for passive devices (patch panels, PDUs) is controlled by DISPLAY_PASSIVE_DEVICES boolean plugin parameter. A device is considered passive if it has cables connected to Front and Rear Ports only and not to Interfaces.<br/>Passive devices are hidden by default. You can display them with 'Display Passive Devices' button on the topology view page. <br/>
-  Actual multi-cable connections between the end-devices a replaced by the direct logical connection once the passive devices are hidden. This logical direct link may be displayed regardless of the passive device visibility in addition to the cabling across patch panels if you set DISPLAY_LOGICAL_MULTICABLE_LINKS plugin parameter to True. DISPLAY_LOGICAL_MULTICABLE_LINKS is set to False by default. This parameter only affects the initial logical link visibility. With hidden passive devices, it is always being displayed.<br/>
-<br/>
-
-Device layers are ordered automatically by default. You can control this behavior with INITIAL_LAYOUT plugin parameter. Valid options are 'vertical', 'horizontal', and 'auto'.<br/>
-'auto' layout relies on NeXt UI dataprocessor best-effort algorithms. It spreads the Nodes across the view so they would be as distant from each other as possible. You may use it if the vertical and horizontal initial layout does not work properly in your browser (this is the issue to be fixed).
-
+Device layers are ordered automatically by default. You can control this behavior with INITIAL_LAYOUT plugin parameter. Valid options are 'layered', and 'auto'.<br/>
+'auto' layout relies on topoSphere best-effort algorithms. It spreads the Nodes across the view so they would be as distant from each other as possible.
 
 
 ### Collect Static Files
@@ -210,15 +166,6 @@ The Plugin contains static files for topology visualization. They should be serv
 ```
 (venv) $ cd /opt/netbox/netbox/
 (venv) $ python3 manage.py collectstatic
-```
-
-### Apply Database Migrations
-
-> For plugin version 0.8.0 and above.
-
-Apply database migrations with Django `manage.py`:
-```
-(venv) $ python3 manage.py migrate
 ```
 
 ### Restart Netbox
@@ -262,39 +209,8 @@ If you are experiencing some unexpected errors or visual behaviors after the ins
 
 # Usage
 
-Once installed and initialized, the Plugin runs on a backend.<br/>
-The Plugin supports a topology visualization of arbitrary sets of Sites and Regions.<br/>
-<br/>
-You can access Topology visualizations in different ways:
-1. By clicking a custom plugin Topology button on a Site page.
-![](samples/sample_topology_button.png)
-The Site topology visualization will open in a pop-up window:
-![](samples/sample_topology_view.png)<br/>
-Nodes are draggable and clickable:
-![](samples/sample_node_tooltip_content.png)<br/>
-You can switch between vertical and horizontal layers sort order back and forth. Default is vertical.<br/>
+Once installed and initialized, the Plugin will be available via Topology Viewer main menu item in NetBox.
 
-2. Using Plugins dropdown menu item: *Plugins -> NextBox UI -> Topology Viewer*.<br/>
-Use Search form controls to pick desired Sites, Regions, or Devices.<br/>
-![](samples/sample_topology_viewer_page01.png)
-<br/>
-
-### Visibility control
-
-You can display or hide any specific device roles on the topology view with 'Select Layer' button:
-![](samples/sample_layer_visibility.png)<br/>
-The list of available device roles is generated automatically based on discovered devices for a visualized site.<br/>
-<br/>
-'Display/Hide Unconnected' button hides or displays the devices with no links attached.<br/>
-<br/>
-'Display/Hide Passive Devices' buttons hides or displays the passive devices (patch pannels, PDUs, etc).<br/>
-<br/>
-In a samples below, edge-sw01 is connected with core-rtr01 and core-rtr02 through Patch Panel A and Patch Panel B with multiple cable hops:<br/>
-![](samples/sample_patch_panels.png)<br/>
-Once you hide the passive devices (default state), a logical direct link shows up between the edge switch and the core routers:<br/>
-![](samples/sample_hide_passive.png)<br/>
-If DISPLAY_LOGICAL_MULTICABLE_LINKS is set to True (default is False) this logical link is displayed initially:<br/>
-![](samples/sample_display_logical_link.png)
 
 ### Required Netbox User Permissions
 The Plugin requires the following user permissions to access the topology view:
