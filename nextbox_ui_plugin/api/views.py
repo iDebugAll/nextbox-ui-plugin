@@ -11,7 +11,3 @@ class NextBoxUIPluginRootView(APIRootView):
     def get_view_name(self):
         return 'NextBoxUI'
 
-
-class SavedTopologyViewSet(ModelViewSet):
-    queryset = SavedTopology.objects.all()
-    serializer_class = serializers.SavedTopologySerializer

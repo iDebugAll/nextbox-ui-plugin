@@ -2,9 +2,9 @@
 
 from django.shortcuts import render
 from django.views.generic import View
-from dcim.models import Cable, Device, Interface, DeviceRole, PowerFeed
-from ipam.models import VLAN
-from circuits.models import CircuitTermination
+from dcim.models import *
+from ipam.models import *
+from circuits.models import *
 from .models import SavedTopology
 from . import forms, filters
 from django.contrib.auth.mixins import PermissionRequiredMixin
@@ -18,25 +18,25 @@ NETBOX_CURRENT_VERSION = version.parse(settings.VERSION)
 
 # Default NeXt UI icons
 SUPPORTED_ICONS = {
-    'switch',
-    'router',
-    'firewall',
-    'wlc',
-    'unknown',
-    'server',
-    'phone',
-    'nexus5000',
-    'ipphone',
-    'host',
-    'camera',
-    'accesspoint',
-    'groups',
-    'groupm',
-    'groupl',
-    'cloud',
-    'unlinked',
-    'hostgroup',
-    'wirelesshost',
+    'network.switch',
+    'network.router',
+    'network.firewall',
+    'network.wlc',
+    'network.unknown',
+    'network.server',
+    'network.phone',
+    'network.nexus5000',
+    'network.ipphone',
+    'network.host',
+    'network.camera',
+    'network.accesspoint',
+    'network.groups',
+    'network.groupm',
+    'network.groupl',
+    'network.cloud',
+    'network.unlinked',
+    'network.hostgroup',
+    'network.wirelesshost',
 }
 
 # Topology layers would be sorted
@@ -75,40 +75,40 @@ interface_full_name_map = {
 
 
 DEFAULT_ICON_MODEL_MAP = {
-    'CSR1000V': 'router',
-    'Nexus': 'switch',
-    'IOSXRv': 'router',
-    'IOSv': 'switch',
-    '2901': 'router',
-    '2911': 'router',
-    '2921': 'router',
-    '2951': 'router',
-    '4321': 'router',
-    '4331': 'router',
-    '4351': 'router',
-    '4421': 'router',
-    '4431': 'router',
-    '4451': 'router',
-    '2960': 'switch',
-    '3750': 'switch',
-    '3850': 'switch',
-    'ASA': 'firewall',
+    'CSR1000V': 'network.router',
+    'Nexus': 'network.switch',
+    'IOSXRv': 'network.router',
+    'IOSv': 'network.switch',
+    '2901': 'network.router',
+    '2911': 'network.router',
+    '2921': 'network.router',
+    '2951': 'network.router',
+    '4321': 'network.router',
+    '4331': 'network.router',
+    '4351': 'network.router',
+    '4421': 'network.router',
+    '4431': 'network.router',
+    '4451': 'network.router',
+    '2960': 'network.switch',
+    '3750': 'network.switch',
+    '3850': 'network.switch',
+    'ASA': 'network.firewall',
 }
 
 
 DEFAULT_ICON_ROLE_MAP = {
-    'border': 'router',
-    'edge-switch': 'switch',
-    'edge-router': 'router',
-    'core-router': 'router',
-    'core-switch': 'switch',
-    'distribution': 'switch',
-    'distribution-router': 'router',
-    'distribution-switch': 'switch',
-    'leaf': 'switch',
-    'spine': 'switch',
-    'access': 'switch',
-    'access-switch': 'switch',
+    'border': 'network.router',
+    'edge-switch': 'network.switch',
+    'edge-router': 'network.router',
+    'core-router': 'network.router',
+    'core-switch': 'network.switch',
+    'distribution': 'network.switch',
+    'distribution-router': 'network.router',
+    'distribution-switch': 'network.switch',
+    'leaf': 'network.switch',
+    'spine': 'network.switch',
+    'access': 'network.switch',
+    'access-switch': 'network.switch',
 }
 
 
@@ -147,9 +147,9 @@ SELECT_LAYERS_LIST_INCLUDE_DEVICE_TAGS = PLUGIN_SETTINGS.get("select_layers_list
 SELECT_LAYERS_LIST_EXCLUDE_DEVICE_TAGS = PLUGIN_SETTINGS.get("select_layers_list_exclude_device_tags", tuple())
 
 # Defines the initial layer alignment direction on the view
-INITIAL_LAYOUT = PLUGIN_SETTINGS.get("INITIAL_LAYOUT", 'auto')
-if INITIAL_LAYOUT not in ('vertical', 'horizontal', 'auto'):
-    INITIAL_LAYOUT = 'auto'
+INITIAL_LAYOUT = PLUGIN_SETTINGS.get("INITIAL_LAYOUT", 'forceDirected')
+if INITIAL_LAYOUT not in ('layered', 'forceDirected'):
+    INITIAL_LAYOUT = 'forceDirected'
 
 
 def if_shortname(ifname):
@@ -192,15 +192,21 @@ def get_icon_type(device_id):
         return 'unknown'
     for tag in nb_device.tags.names():
         if 'icon_' in tag:
-            if tag.replace('icon_', '') in SUPPORTED_ICONS:
-                return tag.replace('icon_', '')
+            if tag.replace('icon_', 'network.') in SUPPORTED_ICONS:
+                return tag.replace('icon_', 'network.')
     for model_base, icon_type in ICON_MODEL_MAP.items():
         if model_base in str(nb_device.device_type.model):
-            return icon_type
+            if icon_type.startswith('network.'):
+                return icon_type
+            else:
+                return f'network.{icon_type}'
     for role_slug, icon_type in ICON_ROLE_MAP.items():
         if str(device_role_obj.slug) == role_slug:
-            return icon_type
-    return 'unknown'
+            if icon_type.startswith('network.'):
+                return icon_type
+            else:
+                return f'network.{icon_type}'
+    return 'network.unknown'
 
 
 def tag_is_hidden(tag):
@@ -236,7 +242,7 @@ def filter_tags(tags):
 
 def get_vlan_topology(nb_devices_qs, vlans):
 
-    topology_dict = {'nodes': [], 'links': []}
+    topology_dict = {'nodes': [], 'edges': []}
     device_roles = set()
     all_device_tags = set()
     multi_cable_connections = []
@@ -283,17 +289,18 @@ def get_vlan_topology(nb_devices_qs, vlans):
         for tag in tags:
             all_device_tags.add((tag, not tag_is_hidden(tag)))
         topology_dict['nodes'].append({
-            'id': device.id,
+            'id': device.name,
             'name': device.name,
+            'label': {'text': device.name},
             'dcimDeviceLink': device_url,
             'primaryIP': primary_ip,
             'serial_number': device.serial,
             'model': device.device_type.model,
             'deviceRole': device_role_obj.slug,
-            'layerSortPreference': get_node_layer_sort_preference(
+            'layer': get_node_layer_sort_preference(
                 device_role_obj.slug
                 ),
-            'icon': get_icon_type(
+            'iconName': get_icon_type(
                 device.id
                 ),
             'isPassive': device_is_passive,
@@ -313,12 +320,12 @@ def get_vlan_topology(nb_devices_qs, vlans):
                 if (mapping_link not in mapped_links) and (mapping_link.reverse() not in mapped_links):
                     mapped_links.append(mapping_link)
 
-                    topology_dict['links'].append({
+                    topology_dict['edges'].append({
                         'id': source_cable[1].id,
                         'dcimCableURL': source_cable[1].get_absolute_url(),
                         'label': f"Cable {source_cable[1].id}",
-                        'source': source_cable[0].device.id,
-                        'target': dest_cable[-1].device.id,
+                        'source': source_cable[0].device.name,
+                        'target': dest_cable[-1].device.name,
                         'sourceDeviceName': source_cable[0].device.name,
                         'targetDeviceName': dest_cable[-1].device.name,
                         "srcIfName": if_shortname(source_cable[0].name),
@@ -329,7 +336,7 @@ def get_vlan_topology(nb_devices_qs, vlans):
 
 
 def get_topology(nb_devices_qs):
-    topology_dict = {'nodes': [], 'links': []}
+    topology_dict = {'nodes': [], 'edges': []}
     device_roles = set()
     all_device_tags = set()
     multi_cable_connections = []
@@ -353,52 +360,37 @@ def get_topology(nb_devices_qs):
             all_device_tags.add((tag, not tag_is_hidden(tag)))
         # Device is considered passive if it has no linked Interfaces.
         # Passive cabling devices use Rear and Front Ports.
-        if NETBOX_CURRENT_VERSION < version.parse("3.3"):
-            links_from_device = Cable.objects.filter(_termination_a_device_id=nb_device.id)
-            links_to_device = Cable.objects.filter(_termination_b_device_id=nb_device.id)
-            if links_from_device:
-                for link in links_from_device:
-                    if isinstance(link.termination_a, Interface) and link.termination_a.device.id == nb_device.id:
+        links_from_device = Cable.objects.filter(terminations__cable_end='A', terminations___device_id=nb_device.id)
+        links_to_device = Cable.objects.filter(terminations__cable_end='B', terminations___device_id=nb_device.id)
+        interfaces_found = False
+        if links_from_device:
+            for link in links_from_device:
+                for ab_link in link.a_terminations + link.b_terminations:
+                    if isinstance(ab_link, Interface) and ab_link.device.id == nb_device.id:
+                        interfaces_found = True
                         break
-                else:
-                    device_is_passive = True
-            if links_to_device:
-                for link in links_to_device:
-                    if isinstance(link.termination_b, Interface) and link.termination_b.device.id == nb_device.id:
+        if links_to_device:
+            for link in links_to_device:
+                for ab_link in link.a_terminations + link.b_terminations:
+                    if isinstance(ab_link, Interface) and ab_link.device.id == nb_device.id:
+                        interfaces_found = True
                         break
-                else:
-                    device_is_passive = True
-        else:
-            links_from_device = Cable.objects.filter(terminations__cable_end='A', terminations___device_id=nb_device.id)
-            links_to_device = Cable.objects.filter(terminations__cable_end='B', terminations___device_id=nb_device.id)
-            interfaces_found = False
-            if links_from_device:
-                for link in links_from_device:
-                    for ab_link in link.a_terminations + link.b_terminations:
-                        if isinstance(ab_link, Interface) and ab_link.device.id == nb_device.id:
-                            interfaces_found = True
-                            break
-            if links_to_device:
-                for link in links_to_device:
-                    for ab_link in link.a_terminations + link.b_terminations:
-                        if isinstance(ab_link, Interface) and ab_link.device.id == nb_device.id:
-                            interfaces_found = True
-                            break
-            if links_to_device or links_from_device:
-                device_is_passive = not interfaces_found
+        if links_to_device or links_from_device:
+            device_is_passive = not interfaces_found
 
         topology_dict['nodes'].append({
-            'id': nb_device.id,
+            'id': nb_device.name,
             'name': nb_device.name,
+            'label': {'text': nb_device.name},
             'dcimDeviceLink': device_url,
             'primaryIP': primary_ip,
             'serial_number': nb_device.serial,
             'model': nb_device.device_type.model,
             'deviceRole': device_role_obj.slug,
-            'layerSortPreference': get_node_layer_sort_preference(
+            'layer': get_node_layer_sort_preference(
                 device_role_obj.slug
             ),
-            'icon': get_icon_type(
+            'iconName': get_icon_type(
                 nb_device.id
             ),
             'isPassive': device_is_passive,
@@ -409,20 +401,15 @@ def get_topology(nb_devices_qs):
         if not links_from_device:
             continue
         for link in links_from_device:
-            if NETBOX_CURRENT_VERSION < version.parse("3.3"):
-                # Include links to discovered devices only
-                if link._termination_b_device_id in device_ids:
-                    links.append(link)
-            else:
-                # Exclude PowerFeed-connected links
-                if (isinstance(link.a_terminations[0], PowerFeed) or (isinstance(link.b_terminations[0], PowerFeed))):
-                    continue
-                # Exclude CircuitTermination-connected links
-                if (isinstance(link.a_terminations[0], CircuitTermination) or (isinstance(link.b_terminations[0], CircuitTermination))):
-                    continue
-                # Include links to discovered devices only
-                if link.b_terminations[0].device_id in device_ids:
-                    links.append(link)
+            # Exclude PowerFeed-connected links
+            if (isinstance(link.a_terminations[0], PowerFeed) or (isinstance(link.b_terminations[0], PowerFeed))):
+                continue
+            # Exclude CircuitTermination-connected links
+            if (isinstance(link.a_terminations[0], CircuitTermination) or (isinstance(link.b_terminations[0], CircuitTermination))):
+                continue
+            # Include links to discovered devices only
+            if link.b_terminations[0].device_id in device_ids:
+                links.append(link)
 
     device_roles = list(device_roles)
     device_roles.sort(key=lambda i: get_node_layer_sort_preference(i[0]))
@@ -437,16 +424,13 @@ def get_topology(nb_devices_qs):
         if NETBOX_CURRENT_VERSION > version.parse("3.3"):
             link.termination_a = link.a_terminations[0]
             link.termination_b = link.b_terminations[0]
-        topology_dict['links'].append({
-            'id': link.id,
+        topology_dict['edges'].append({
             'label': f"Cable {link.id}",
             'dcimCableURL': link_url,
-            'source': link.termination_a.device.id,
-            'target': link.termination_b.device.id,
-            'sourceDeviceName': link.termination_a.device.name,
-            'targetDeviceName': link.termination_b.device.name,
-            "srcIfName": if_shortname(link.termination_a.name),
-            "tgtIfName": if_shortname(link.termination_b.name)
+            'source': link.termination_a.device.name,
+            'target': link.termination_b.device.name,
+            "sourceInterfaceLabel": if_shortname(link.termination_a.name),
+            "targetInterfaceLabel": if_shortname(link.termination_b.name)
         })
         if not (isinstance(link.termination_a, Interface) or isinstance(link.termination_b, Interface)):
             # Skip trace if none of cable terminations is an Interface
@@ -459,11 +443,9 @@ def get_topology(nb_devices_qs):
         trace_result = interface_side.trace()
         if not trace_result:
             continue
-        if NETBOX_CURRENT_VERSION >= version.parse("2.10.1"):
-            # Version 2.10.1 introduces some changes in cable trace behavior.
-            cable_path = trace_result
-        else:
-            cable_path, *ignore = trace_result
+        
+        cable_path = trace_result
+
         # identify segmented cable paths between end-devices
         if len(cable_path) < 2:
             continue
@@ -474,7 +456,7 @@ def get_topology(nb_devices_qs):
     for cable_path in multi_cable_connections:
         link_id = max(link_ids) + 1  # dummy ID for a logical link
         link_ids.add(link_id)
-        topology_dict['links'].append({
+        topology_dict['edges'].append({
             'id': link_id,
             'source': cable_path[0][0].device.id,
             'target': cable_path[-1][2].device.id,
@@ -524,10 +506,7 @@ class TopologyView(PermissionRequiredMixin, View):
     permission_required = ('dcim.view_site', 'dcim.view_device', 'dcim.view_cable')
     queryset = Device.objects.all()
     filterset = filters.TopologyFilterSet
-    if NETBOX_CURRENT_VERSION >= version.parse("3.0"):
-        template_name = 'nextbox_ui_plugin/topology_3.x.html'
-    else:
-        template_name = 'nextbox_ui_plugin/topology.html'
+    template_name = 'nextbox_ui_plugin/topology_4.x.html'
 
     def get(self, request):
 
@@ -567,21 +546,10 @@ class TopologyView(PermissionRequiredMixin, View):
             'display_passive_devices': layout_context.get('displayPassiveDevices') or DISPLAY_PASSIVE_DEVICES,
             'initial_layout': INITIAL_LAYOUT,
             'filter_form': forms.TopologyFilterForm(
-                layout_context.get('requestGET') or request.GET,
+                request.GET,
                 label_suffix=''
             ),
-            'load_saved_filter_form': forms.LoadSavedTopologyFilterForm(
-                request.GET,
-                label_suffix='',
-                user=request.user
-            ),
+            'model': Device,
             'load_saved': SavedTopology.objects.all(), 
             'requestGET': dict(request.GET),
         })
-
-
-class SiteTopologyView(TopologyView):
-    if NETBOX_CURRENT_VERSION >= version.parse("3.0"):
-        template_name = 'nextbox_ui_plugin/site_topology_3.x.html'
-    else:
-        template_name = 'nextbox_ui_plugin/site_topology.html'

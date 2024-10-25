@@ -18,6 +18,7 @@ setup(
     install_requires=[],
     packages=find_packages(),
     license='MIT',
+    license_files=('LICENSE', 'LICENSE-topoSphere'),
     include_package_data=True,
     keywords=['netbox', 'netbox-plugin', 'plugin'],
     classifiers=[
