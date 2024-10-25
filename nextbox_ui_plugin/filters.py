@@ -212,6 +212,30 @@ class TopologyFilterSet(
         method='_has_virtual_device_context',
         label=_('Has virtual device context'),
     )
+    exclude_site = django_filters.ModelMultipleChoiceFilter(
+        field_name='site',
+        queryset=Site.objects.all(),
+        label=_('Exclude Site'),
+        method='filter_exclude_site'
+    )
+    exclude_site_group = django_filters.ModelMultipleChoiceFilter(
+        field_name='site__group',
+        queryset=SiteGroup.objects.all(),
+        label=_('Exclude Site Group'),
+        method='filter_exclude_site_group'
+    )
+    exclude_location = django_filters.ModelMultipleChoiceFilter(
+        field_name='location',
+        queryset=Location.objects.all(),
+        label=_('Exclude Location'),
+        method='filter_exclude_location'
+    )
+    exclude_role = django_filters.ModelMultipleChoiceFilter(
+        field_name='role',
+        queryset=DeviceRole.objects.all(),
+        label=_('Exclude Role'),
+        method='filter_exclude_role'
+    )
 
     class Meta:
         model = Device
@@ -281,4 +305,27 @@ class TopologyFilterSet(
         if value:
             return queryset.filter(params).distinct()
         return queryset.exclude(params)
+    
+    def filter_exclude_site(self, queryset, name, value):
+        """
+        Exclude devices belonging to the selected sites.
+        """
+        return queryset.exclude(site__in=value)
 
+    def filter_exclude_site_group(self, queryset, name, value):
+        """
+        Exclude devices belonging to the selected site groups.
+        """
+        return queryset.exclude(site__group__in=value)
+    
+    def filter_exclude_location(self, queryset, name, value):
+        """
+        Exclude devices belonging to the selected locations.
+        """
+        return queryset.exclude(location__in=value)
+    
+    def filter_exclude_role(self, queryset, name, value):
+        """
+        Exclude devices that have any of the selected roles.
+        """
+        return queryset.exclude(role__in=value)

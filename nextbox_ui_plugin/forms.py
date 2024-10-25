@@ -34,6 +34,7 @@ class TopologyFilterForm(
             'has_primary_ip', 'has_oob_ip', 'virtual_chassis_member', 'has_virtual_device_context',
             name=_('Miscellaneous')
         ),
+        FieldSet('exclude_site', 'exclude_site_group', 'exclude_location', 'exclude_role', name=_('Exclude')),
         FieldSet('display_unconnected', 'display_passive', name=_('Topology Presentation Preferences')),
     )
     selector_fields = ('filter_id', 'q', 'region_id', 'site_group_id', 'site_id', 'location_id', 'rack_id')
@@ -192,6 +193,27 @@ class TopologyFilterForm(
         label=_('Cluster group')
     )
     tag = TagFilterField(model)
+    # Exclude fields
+    exclude_site = DynamicModelMultipleChoiceField(
+        queryset=Site.objects.all(),
+        required=False,
+        label=_('Exclude Site')
+    )
+    exclude_site_group = DynamicModelMultipleChoiceField(
+        queryset=SiteGroup.objects.all(),
+        required=False,
+        label=_('Exclude Site Group')
+    )
+    exclude_location = DynamicModelMultipleChoiceField(
+        queryset=Location.objects.all(),
+        required=False,
+        label=_('Exclude Location')
+    )
+    exclude_role = DynamicModelMultipleChoiceField(
+        queryset=DeviceRole.objects.all(),
+        required=False,
+        label=_('Exclude Role')
+    )
     # Plugin-specific fields
     display_unconnected = forms.NullBooleanField(
         required=False,
