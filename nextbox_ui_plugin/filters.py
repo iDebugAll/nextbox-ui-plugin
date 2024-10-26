@@ -212,6 +212,13 @@ class TopologyFilterSet(
         method='_has_virtual_device_context',
         label=_('Has virtual device context'),
     )
+    exclude_device_id = django_filters.ModelMultipleChoiceFilter(
+        field_name='id',
+        to_field_name='id',
+        queryset=Device.objects.all(),
+        label=_('Exclude Device'),
+        method='filter_exclude_device_id'
+    )
     exclude_site = django_filters.ModelMultipleChoiceFilter(
         field_name='site',
         queryset=Site.objects.all(),
@@ -311,6 +318,13 @@ class TopologyFilterSet(
         Exclude devices belonging to the selected sites.
         """
         return queryset.exclude(site__in=value)
+    
+    def filter_exclude_device_id(self, queryset, name, value):
+        """
+        Exclude devices with selected IDs.
+        """
+        device_ids = [device.id for device in value]
+        return queryset.exclude(id__in=device_ids)
 
     def filter_exclude_site_group(self, queryset, name, value):
         """

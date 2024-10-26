@@ -34,7 +34,7 @@ class TopologyFilterForm(
             'has_primary_ip', 'has_oob_ip', 'virtual_chassis_member', 'has_virtual_device_context',
             name=_('Miscellaneous')
         ),
-        FieldSet('exclude_site', 'exclude_site_group', 'exclude_location', 'exclude_role', name=_('Exclude')),
+        FieldSet('exclude_device_id', 'exclude_site', 'exclude_site_group', 'exclude_location', 'exclude_role', name=_('Exclude')),
         FieldSet('display_unconnected', 'display_passive', name=_('Topology Presentation Preferences')),
     )
     selector_fields = ('filter_id', 'q', 'region_id', 'site_group_id', 'site_id', 'location_id', 'rack_id')
@@ -194,6 +194,12 @@ class TopologyFilterForm(
     )
     tag = TagFilterField(model)
     # Exclude fields
+    exclude_device_id = DynamicModelMultipleChoiceField(
+        to_field_name='id',
+        queryset=Device.objects.all(),
+        required=False,
+        label=_('Exclude Device')
+    )
     exclude_site = DynamicModelMultipleChoiceField(
         queryset=Site.objects.all(),
         required=False,
