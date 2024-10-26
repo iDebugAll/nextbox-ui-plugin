@@ -12,7 +12,7 @@ The Plugin delivers adaptive and scalable network topology maps, featuring advan
 
 Newest NextBox UI Plugin versions 1.X support NetBox 4.1.<br/>
 
-Legacy NextBox UI Plugin version 0.15 support NetBox 3.5-4.1.
+Legacy NextBox UI Plugin version 0.15 supports NetBox 3.5-4.1.
 
 # Installation
 
