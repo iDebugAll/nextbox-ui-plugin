@@ -10,11 +10,12 @@ else:
 class NextBoxUIConfig(PluginConfig):
     name = 'nextbox_ui_plugin'
     verbose_name = 'NextBox UI'
-    description = 'A topology visualization plugin for Netbox powered by NextUI Toolkit.'
-    version = '0.15.0'
+    description = 'Next-Gen topology visualization plugin for Netbox powered by topoSphere SDK.'
+    version = '1.0.0'
     author = 'Igor Korotchenkov'
     author_email = 'iDebugAll@gmail.com'
     base_url = 'nextbox-ui'
+    min_version = "4.1.0"
     required_settings = []
     default_settings = {}
     caching_config = {

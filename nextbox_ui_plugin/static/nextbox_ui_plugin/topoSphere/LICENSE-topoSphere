@@ -1,0 +1,154 @@
+# topoSphere Software Development Kit Proprietary License Agreement
+
+**Last Updated: October 25, 2024**
+
+This **License Agreement** (the “Agreement”) is a legally binding agreement between you (either an individual or a legal entity) and **Igor Korotchenkov** (“Licensor”) governing the use of the **topoSphere Software Development Kit** (the “Software Development Kit” or “SDK”).
+
+By installing, copying, or otherwise using the Software Development Kit, you agree to be bound by the terms of this Agreement. If you do not agree to these terms, do not install or use the Software Development Kit.
+
+---
+
+## Definitions
+
+- **Licensor**: Igor Korotchenkov.
+- **Licensee**: You (either an individual or a legal entity) obtaining the license.
+- **Software Development Kit (SDK)**: The topoSphere Software Development Kit provided under this Agreement.
+- **NextBox-UI-Plugin**: The specific plugin for NetBox with which the SDK is integrated.
+- **Commercial Use**: Any use of the SDK as part of a paid product or service, integration into proprietary software, or any use intended for financial gain.
+- **Non-Commercial Use**: Use by individuals or organizations without the intent of financial gain.
+- **Personal Use**: Use by individuals for personal projects or learning.
+- **Educational Use**: Use by educational institutions or for teaching purposes.
+
+---
+
+## 1. Grant of License
+
+Licensor hereby grants you a limited, non-exclusive, non-transferable, revocable license to use the Software Development Kit solely as an integrated component of the **NextBox-UI-Plugin** for **NetBox**. This license is strictly limited to non-commercial, personal, or educational use, which includes:
+
+- **Non-Commercial Use**: Use by individuals or organizations without the intent of financial gain.
+- **Personal Use**: Use by individuals for personal projects or learning.
+- **Educational Use**: Use by educational institutions or for teaching purposes.
+
+Any other type of use requires prior written consent from Licensor.
+
+---
+
+## 2. Attribution
+
+You must provide appropriate attribution to **Igor Korotchenkov** as the developer of the Software Development Kit. This attribution must be prominently included in the documentation, the About section, or any other visible part of any instance of the Software Development Kit in use, stating:
+
+“Powered by topoSphere.”
+
+The attribution should be clear and not obscured by other text or graphics.
+
+---
+
+## 3. Restrictions
+
+You may not:
+
+### a. No Derivatives
+
+Modify, adapt, translate, reverse engineer, decompile, disassemble, or create derivative works based on the Software Development Kit, in whole or in part.
+
+### b. No Commercial Use
+
+Use the Software Development Kit for any commercial purpose without obtaining an additional commercial license from Licensor. Commercial use includes, but is not limited to:
+
+- Incorporating the SDK into a paid product or service.
+- Using the SDK within proprietary software that is sold or distributed for profit.
+- Leveraging the SDK to provide paid consultancy or development services.
+
+### c. Usage Limitation
+
+Use the Software Development Kit as an independent component or as part of any other software, product, or platform outside of the **NextBox-UI-Plugin** for **NetBox** without prior written consent from Licensor.
+
+---
+
+## 4. Ownership
+
+The Software Development Kit is licensed, not sold. All title, rights, and ownership in and to the Software Development Kit, including any intellectual property rights, remain exclusively with **Igor Korotchenkov**. This Agreement does not grant you any ownership rights in the Software Development Kit, and no rights are granted by implication, estoppel, or otherwise.
+
+---
+
+## 5. Termination
+
+This license is effective until terminated. Licensor may terminate this Agreement immediately upon written notice if you breach any of the terms of this Agreement. Upon termination, you must immediately cease all use of the Software Development Kit and destroy all copies, in whole or in part, of the Software Development Kit in your possession or control. This includes, but is not limited to, any backups or derivatives.
+
+### Survival
+
+Sections **6 (Disclaimer of Warranty)**, **7 (Limitation of Liability)**, **4 (Ownership)**, **8 (Governing Law)**, **9 (Indemnification)**, **10 (Entire Agreement)**, **11 (Severability)**, **12 (Assignment)**, **13 (No Waiver)**, and **14 (Amendments)** shall survive termination of this Agreement.
+
+---
+
+## 6. Disclaimer of Warranty
+
+THE SOFTWARE DEVELOPMENT KIT IS PROVIDED "AS IS," WITHOUT WARRANTY OF ANY KIND, WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE. LICENSOR DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. LICENSOR DOES NOT WARRANT THAT THE SOFTWARE DEVELOPMENT KIT WILL MEET YOUR REQUIREMENTS OR THAT ITS OPERATION WILL BE UNINTERRUPTED, ERROR-FREE, OR FREE FROM HARMFUL COMPONENTS.
+
+---
+
+## 7. Limitation of Liability
+
+IN NO EVENT SHALL LICENSOR BE LIABLE FOR ANY DAMAGES (INCLUDING, BUT NOT LIMITED TO, DIRECT, INDIRECT, INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES) ARISING OUT OF THE USE OR INABILITY TO USE THE SOFTWARE DEVELOPMENT KIT, EVEN IF LICENSOR HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+### Cap on Liability
+
+IN NO EVENT SHALL LICENSOR'S TOTAL LIABILITY FOR ALL CLAIMS RELATED TO THIS AGREEMENT EXCEED THE AMOUNT PAID BY LICENSEE FOR THE SOFTWARE DEVELOPMENT KIT.
+
+---
+
+## 8. Governing Law
+
+This Agreement shall be governed by and construed in accordance with the laws of **Dubai, United Arab Emirates**, without regard to its conflict of laws principles. Any disputes arising out of or in connection with this Agreement shall be subject to the exclusive jurisdiction of the courts located in Dubai, UAE.
+
+---
+
+## 9. Indemnification
+
+You agree to indemnify, defend, and hold harmless **Igor Korotchenkov** and his agents from and against any and all claims, damages, obligations, losses, liabilities, costs, or debt, and expenses (including but not limited to attorney's fees) arising from:
+
+- Your use of and access to the Software Development Kit.
+- Your violation of any term of this Agreement.
+- Your violation of any third-party right, including without limitation any copyright, property, or privacy right.
+
+---
+
+## 10. Entire Agreement
+
+This Agreement constitutes the entire agreement between you and **Igor Korotchenkov** regarding the use of the Software Development Kit and supersedes all prior or contemporaneous understandings, agreements, representations, and warranties, whether written or oral, regarding such subject matter.
+
+---
+
+## 11. Severability
+
+If any provision of this Agreement is found to be unenforceable or invalid under any applicable law, such unenforceability or invalidity shall not render this Agreement unenforceable or invalid as a whole. Such provisions shall be deleted without affecting the remaining provisions herein.
+
+---
+
+## 12. Assignment
+
+You may not assign, transfer, sublicense, or otherwise delegate any rights or obligations under this Agreement without the prior written consent of **Igor Korotchenkov**. Any attempt to do so without such consent is void and will automatically terminate this Agreement.
+
+---
+
+## 13. No Waiver
+
+No waiver of any term of this Agreement shall be deemed a further or continuing waiver of such term or any other term, and Licensor’s failure to assert any right or provision under this Agreement shall not constitute a waiver of such right or provision.
+
+---
+
+## 14. Amendments
+
+Licensor reserves the right to amend this Agreement at any time by publishing a new version of the Agreement at [https://toposphere.net/nextbox/license](https://toposphere.net/nextbox/license). Continued use of the Software Development Kit after any such amendments constitutes acceptance of the new terms.
+
+---
+
+## Acknowledgment
+
+By installing or using the Software Development Kit, you acknowledge that you have read this Agreement, understand it, and agree to be bound by its terms and conditions.
+
+---
+
+**Igor Korotchenkov**  
+**Email:** iDebugAll@gmail.com  
+**Website:** [https://toposphere.net](https://toposphere.net)  

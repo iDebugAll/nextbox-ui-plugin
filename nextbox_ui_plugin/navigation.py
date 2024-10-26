@@ -1,17 +1,15 @@
-from packaging import version
-from django.conf import settings
-NETBOX_CURRENT_VERSION = version.parse(settings.VERSION)
+from netbox.plugins import PluginMenu, PluginMenuItem
 
-if NETBOX_CURRENT_VERSION >= version.parse("4.0.0"):
-    from netbox.plugins import PluginMenuItem
-else:
-    from extras.plugins import PluginMenuItem
-
-
-menu_items = (
-    PluginMenuItem(
-        link='plugins:nextbox_ui_plugin:topology',
-        link_text='Topology Viewer',
-        buttons=()
+menu = PluginMenu(
+    label='Topology Viewer',
+    icon_class='mdi mdi-map-search-outline',
+    groups=(
+        ('TOPOLOGY',
+            (PluginMenuItem(
+                link='plugins:nextbox_ui_plugin:topology',
+                link_text='Topology',
+                permissions = ('dcim.view_site', 'dcim.view_device', 'dcim.view_cable'),
+            ),)
+        ),
     ),
 )

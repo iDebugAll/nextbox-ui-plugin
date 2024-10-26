@@ -5,7 +5,5 @@ from . import views
 router = DefaultRouter()
 router.APIRootView = views.NextBoxUIPluginRootView
 
-router.register(r'savedtopologies', views.SavedTopologyViewSet)
-
 app_name = "nextbox_ui_plugin-api"
 urlpatterns = router.urls
