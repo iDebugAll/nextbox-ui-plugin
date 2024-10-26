@@ -126,15 +126,15 @@ ICON_ROLE_MAP = MANUAL_ICON_ROLE_MAP or DEFAULT_ICON_ROLE_MAP
 # Defines whether Devices with no connections
 # are displayed on the topology view by default or not.
 DISPLAY_UNCONNECTED = PLUGIN_SETTINGS.get("DISPLAY_UNCONNECTED", True)
-
-# Defines whether logical links between end-devices for multi-cable hops
-# are displayed in addition to the physical cabling on the topology view by default or not.
-DISPLAY_LOGICAL_MULTICABLE_LINKS = PLUGIN_SETTINGS.get("DISPLAY_LOGICAL_MULTICABLE_LINKS", False)
+if DISPLAY_UNCONNECTED not in (True, False):
+    DISPLAY_UNCONNECTED = True
 
 # Defines whether passive devices
 # are displayed on the topology view by default or not.
 # Passive devices are patch pannels, power distribution units, etc.
 DISPLAY_PASSIVE_DEVICES = PLUGIN_SETTINGS.get("DISPLAY_PASSIVE_DEVICES", False)
+if DISPLAY_PASSIVE_DEVICES not in (True, False):
+    DISPLAY_PASSIVE_DEVICES = False
 
 # Hide these roles by default
 UNDISPLAYED_DEVICE_ROLE_SLUGS = PLUGIN_SETTINGS.get("undisplayed_device_role_slugs", tuple())
@@ -386,7 +386,8 @@ def get_topology(nb_devices_qs, params):
                         break
         if links_to_device or links_from_device:
             device_is_passive = not interfaces_found
-        if not (links_from_device and links_to_device):
+        
+        if not (links_from_device and links_to_device) and not device_is_passive:
             divice_is_unconnected = True
         else:
             divice_is_unconnected = False
@@ -394,7 +395,7 @@ def get_topology(nb_devices_qs, params):
         if display_unconnected is False and divice_is_unconnected:
             continue
 
-        topology_dict['nodes'].append({
+        node_data = {
             'id': nb_device.name,
             'name': nb_device.name,
             'label': {'text': nb_device.name},
@@ -412,9 +413,17 @@ def get_topology(nb_devices_qs, params):
             'isPassive': device_is_passive,
             'isUnconnected': divice_is_unconnected,
             'tags': tags,
-        })
-        is_visible = not (device_role_obj.slug in UNDISPLAYED_DEVICE_ROLE_SLUGS)
-        device_roles.add((device_role_obj.slug, device_role_obj.name, is_visible))
+        }
+
+        if display_passive:
+            is_visible = not (device_role_obj.slug in UNDISPLAYED_DEVICE_ROLE_SLUGS)
+            device_roles.add((device_role_obj.slug, device_role_obj.name, is_visible))
+            topology_dict['nodes'].append(node_data)
+        elif not display_passive and not device_is_passive:
+            is_visible = not (device_role_obj.slug in UNDISPLAYED_DEVICE_ROLE_SLUGS)
+            device_roles.add((device_role_obj.slug, device_role_obj.name, is_visible))
+            topology_dict['nodes'].append(node_data)
+
         if not links_from_device:
             continue
         for link in links_from_device:
@@ -436,49 +445,53 @@ def get_topology(nb_devices_qs, params):
         return topology_dict, device_roles, multi_cable_connections, list(all_device_tags)
     link_ids = set()
     for link in links:
-        link_ids.add(link.id)
+        interface_to_interface = isinstance(link.a_terminations[0], Interface) and isinstance(link.b_terminations[0], Interface)
+        at_least_one_interface = isinstance(link.a_terminations[0], Interface) or isinstance(link.b_terminations[0], Interface)
         link_url = link.get_absolute_url()
-        if NETBOX_CURRENT_VERSION > version.parse("3.3"):
-            link.termination_a = link.a_terminations[0]
-            link.termination_b = link.b_terminations[0]
-        topology_dict['edges'].append({
+        edge_data = {
             'label': f"Cable {link.id}",
             'dcimCableURL': link_url,
-            'source': link.termination_a.device.name,
-            'target': link.termination_b.device.name,
-            "sourceInterfaceLabel": if_shortname(link.termination_a.name),
-            "targetInterfaceLabel": if_shortname(link.termination_b.name)
-        })
-        if not (isinstance(link.termination_a, Interface) or isinstance(link.termination_b, Interface)):
+            'source': link.a_terminations[0].device.name,
+            'target': link.b_terminations[0].device.name,
+            "sourceInterfaceLabel": if_shortname(link.a_terminations[0].name),
+            "targetInterfaceLabel": if_shortname(link.b_terminations[0].name)
+        }
+        if display_passive:
+            link_ids.add(link.id)
+            topology_dict['edges'].append(edge_data)
+
+        if not display_passive and interface_to_interface:
+            link_ids.add(link.id)
+            topology_dict['edges'].append(edge_data)
+
+        if not at_least_one_interface:
             # Skip trace if none of cable terminations is an Interface
             continue
+        if display_passive:
+            # Do not calculate logical links if passive devices are displayed
+            continue
         interface_side = None
-        if isinstance(link.termination_a, Interface):
-            interface_side = link.termination_a
-        elif isinstance(link.termination_b, Interface):
-            interface_side = link.termination_b
+        if isinstance(link.a_terminations[0], Interface):
+            interface_side = link.a_terminations[0]
+        elif isinstance(link.b_terminations[0], Interface):
+            interface_side = link.b_terminations[0]
         trace_result = interface_side.trace()
         if not trace_result:
             continue
-        
         cable_path = trace_result
-
         # identify segmented cable paths between end-devices
         if len(cable_path) < 2:
             continue
-        if isinstance(cable_path[0][0], Interface) and isinstance(cable_path[-1][2], Interface):
-            if set([c[1] for c in cable_path]) in [set([c[1] for c in x]) for x in multi_cable_connections]:
+        if isinstance(cable_path[0][0][0], Interface) and isinstance(cable_path[-1][2][0], Interface):
+            if set([c[1][0] for c in cable_path]) in [set([c[1][0] for c in x]) for x in multi_cable_connections]:
                 continue
             multi_cable_connections.append(cable_path)
     for cable_path in multi_cable_connections:
-        link_id = max(link_ids) + 1  # dummy ID for a logical link
-        link_ids.add(link_id)
         topology_dict['edges'].append({
-            'id': link_id,
-            'source': cable_path[0][0].device.id,
-            'target': cable_path[-1][2].device.id,
-            "srcIfName": if_shortname(cable_path[0][0].name),
-            "tgtIfName": if_shortname(cable_path[-1][2].name),
+            'source': cable_path[0][0][0].device.name,
+            'target': cable_path[-1][2][0].device.name,
+            "sourceInterfaceLabel": if_shortname(cable_path[0][0][0].name),
+            "targetInterfaceLabel": if_shortname(cable_path[-1][2][0].name),
             "isLogicalMultiCable": True,
         })
     return topology_dict, device_roles, multi_cable_connections, all_device_tags
@@ -539,6 +552,8 @@ class TopologyView(PermissionRequiredMixin, View):
         display_passive = request.GET.get('display_passive')
         if display_passive is not None:
             display_passive = display_passive.lower() == 'true'
+        else:
+            display_passive = DISPLAY_PASSIVE_DEVICES
 
         params = {
             'display_unconnected': display_unconnected,
@@ -567,19 +582,11 @@ class TopologyView(PermissionRequiredMixin, View):
 
         return render(request, self.template_name, {
             'source_data': json.dumps(topology_dict),
-            'display_unconnected': params['display_unconnected'],
-            'device_roles': device_roles,
-            'device_tags': device_tags,
-            'undisplayed_roles': list(UNDISPLAYED_DEVICE_ROLE_SLUGS),
-            'undisplayed_device_tags': list(UNDISPLAYED_DEVICE_TAGS),
-            'display_logical_multicable_links': DISPLAY_LOGICAL_MULTICABLE_LINKS,
-            'display_passive': params['display_passive'],
             'initial_layout': INITIAL_LAYOUT,
             'filter_form': forms.TopologyFilterForm(
                 request.GET,
                 label_suffix=''
             ),
             'model': Device,
-            'load_saved': SavedTopology.objects.all(), 
             'requestGET': dict(request.GET),
         })
