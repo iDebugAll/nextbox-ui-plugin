@@ -1,6 +1,18 @@
 # NextBox UI Plugin
 
-NextBox UI is a Next Generation topology visualization plugin for [NetBox](https://github.com/netbox-community/netbox) powered by topoSphere SDK.
+NextBox UI is a Next Generation topology visualization plugin for [NetBox](https://github.com/netbox-community/netbox) powered by topoSphere SDK.<br/>
+
+The Plugin delivers adaptive and scalable network topology maps, featuring advanced auto-layout algorithms, extended Filters, and multiple export options. Designed for efficiency and flexibility, NextBox UI enhances the visualization and management of complex network infrastructures within NetBox, providing users with intuitive tools to customize views, streamline network planning, and facilitate comprehensive data analysis.
+
+![](samples/topology_viewer_light_mode.png)
+*Now with Dark Mode!*
+![](samples/topology_viewer_dark_mode.png)
+
+# Compatibility
+
+Newest NextBox UI Plugin versions 1.X support NetBox 4.1.<br/>
+
+Legacy NextBox UI Plugin version 0.15 support NetBox 3.5-4.1.
 
 # Installation
 
@@ -218,3 +230,7 @@ The Plugin requires the following user permissions to access the topology view:
   - dcim | site   | Can read site
   - dcim | device | Can view device
   - dcim | cable  | Can view cable
+
+# Licensing
+
+Plugin code is published under MIT license. Embedded topoSphere SDK bundle is published under proprietary license special for NextBox UI Plugin and NetBox Community free of charge.
