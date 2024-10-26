@@ -342,7 +342,9 @@ def get_vlan_topology(nb_devices_qs, vlans):
     return topology_dict, device_roles, multi_cable_connections, list(all_device_tags)
 
 
-def get_topology(nb_devices_qs):
+def get_topology(nb_devices_qs, params):
+    display_unconnected = params.get('display_unconnected')
+    display_passive = params.get('display_passive')
     topology_dict = {'nodes': [], 'edges': []}
     device_roles = set()
     all_device_tags = set()
@@ -384,6 +386,13 @@ def get_topology(nb_devices_qs):
                         break
         if links_to_device or links_from_device:
             device_is_passive = not interfaces_found
+        if not (links_from_device and links_to_device):
+            divice_is_unconnected = True
+        else:
+            divice_is_unconnected = False
+
+        if display_unconnected is False and divice_is_unconnected:
+            continue
 
         topology_dict['nodes'].append({
             'id': nb_device.name,
@@ -401,6 +410,7 @@ def get_topology(nb_devices_qs):
                 nb_device.id
             ),
             'isPassive': device_is_passive,
+            'isUnconnected': divice_is_unconnected,
             'tags': tags,
         })
         is_visible = not (device_role_obj.slug in UNDISPLAYED_DEVICE_ROLE_SLUGS)
@@ -522,6 +532,19 @@ class TopologyView(PermissionRequiredMixin, View):
         elif 'saved_topology_id' in request.GET:
             self.queryset = Device.objects.none()
 
+        display_unconnected = request.GET.get('display_unconnected')
+        if display_unconnected is not None:
+            display_unconnected = display_unconnected.lower == 'true'
+
+        display_passive = request.GET.get('display_passive')
+        if display_passive is not None:
+            display_passive = display_passive.lower() == 'true'
+
+        params = {
+            'display_unconnected': display_unconnected,
+            'display_passive': display_passive,
+        }
+
         saved_topology_id = request.GET.get('saved_topology_id')
         layout_context = {}
 
@@ -538,19 +561,19 @@ class TopologyView(PermissionRequiredMixin, View):
 
             self.queryset = self.filterset(clean_request, self.queryset).qs
             if len(vlans) == 0:
-                topology_dict, device_roles, multi_cable_connections, device_tags = get_topology(self.queryset)
+                topology_dict, device_roles, multi_cable_connections, device_tags = get_topology(self.queryset, params)
             else:
                 topology_dict, device_roles, multi_cable_connections, device_tags = get_vlan_topology(self.queryset, vlans)
 
         return render(request, self.template_name, {
             'source_data': json.dumps(topology_dict),
-            'display_unconnected': layout_context.get('displayUnconnected') or DISPLAY_UNCONNECTED,
+            'display_unconnected': params['display_unconnected'],
             'device_roles': device_roles,
             'device_tags': device_tags,
             'undisplayed_roles': list(UNDISPLAYED_DEVICE_ROLE_SLUGS),
             'undisplayed_device_tags': list(UNDISPLAYED_DEVICE_TAGS),
             'display_logical_multicable_links': DISPLAY_LOGICAL_MULTICABLE_LINKS,
-            'display_passive_devices': layout_context.get('displayPassiveDevices') or DISPLAY_PASSIVE_DEVICES,
+            'display_passive': params['display_passive'],
             'initial_layout': INITIAL_LAYOUT,
             'filter_form': forms.TopologyFilterForm(
                 request.GET,
