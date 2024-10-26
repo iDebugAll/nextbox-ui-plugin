@@ -127,7 +127,7 @@ ICON_ROLE_MAP = MANUAL_ICON_ROLE_MAP or DEFAULT_ICON_ROLE_MAP
 # are displayed on the topology view by default or not.
 DISPLAY_UNCONNECTED = PLUGIN_SETTINGS.get("DISPLAY_UNCONNECTED", True)
 if DISPLAY_UNCONNECTED not in (True, False):
-    DISPLAY_UNCONNECTED = True
+    DISPLAY_UNCONNECTED = False
 
 # Defines whether passive devices
 # are displayed on the topology view by default or not.
@@ -387,7 +387,7 @@ def get_topology(nb_devices_qs, params):
         if links_to_device or links_from_device:
             device_is_passive = not interfaces_found
         
-        if not (links_from_device and links_to_device) and not device_is_passive:
+        if not (links_from_device or links_to_device):
             divice_is_unconnected = True
         else:
             divice_is_unconnected = False
