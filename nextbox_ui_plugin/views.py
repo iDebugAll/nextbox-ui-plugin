@@ -399,11 +399,6 @@ def get_topology(nb_devices_qs, params):
             'id': nb_device.name,
             'name': nb_device.name,
             'label': {'text': nb_device.name},
-            'dcimDeviceLink': device_url,
-            'primaryIP': primary_ip,
-            'serial_number': nb_device.serial,
-            'model': nb_device.device_type.model,
-            'deviceRole': device_role_obj.slug,
             'layer': get_node_layer_sort_preference(
                 device_role_obj.slug
             ),
@@ -413,6 +408,14 @@ def get_topology(nb_devices_qs, params):
             'isPassive': device_is_passive,
             'isUnconnected': divice_is_unconnected,
             'tags': tags,
+            'customAttributes': {
+                'name': nb_device.name,
+                'model': nb_device.device_type.model,
+                'serialNumber': nb_device.serial,
+                'deviceRole': device_role_obj.name,
+                'primaryIP': primary_ip,
+                'dcimDeviceLink': device_url,
+            }
         }
 
         if display_passive:
@@ -449,12 +452,17 @@ def get_topology(nb_devices_qs, params):
         at_least_one_interface = isinstance(link.a_terminations[0], Interface) or isinstance(link.b_terminations[0], Interface)
         link_url = link.get_absolute_url()
         edge_data = {
-            'label': f"Cable {link.id}",
-            'dcimCableURL': link_url,
-            'source': link.a_terminations[0].device.name,
-            'target': link.b_terminations[0].device.name,
+            "label": f"Cable {link.id}",
+            "source": link.a_terminations[0].device.name,
+            "target": link.b_terminations[0].device.name,
             "sourceInterfaceLabel": if_shortname(link.a_terminations[0].name),
-            "targetInterfaceLabel": if_shortname(link.b_terminations[0].name)
+            "targetInterfaceLabel": if_shortname(link.b_terminations[0].name),
+            "customAttributes": {
+                "name": f"Cable {link.id}",
+                "dcimCableURL": link_url,
+                "source": link.a_terminations[0].device.name,
+                "target": link.b_terminations[0].device.name,
+            }
         }
         if display_passive:
             link_ids.add(link.id)
@@ -493,6 +501,12 @@ def get_topology(nb_devices_qs, params):
             "sourceInterfaceLabel": if_shortname(cable_path[0][0][0].name),
             "targetInterfaceLabel": if_shortname(cable_path[-1][2][0].name),
             "isLogicalMultiCable": True,
+            "customAttributes": {
+                "name": f"Multi-Cable Connection",
+                "dcimCableURL": f"/dcim/interfaces/{cable_path[0][0][0].id}/trace/",
+                "source": link.a_terminations[0].device.name,
+                "target": link.b_terminations[0].device.name,
+            }
         })
     return topology_dict, device_roles, multi_cable_connections, all_device_tags
 
