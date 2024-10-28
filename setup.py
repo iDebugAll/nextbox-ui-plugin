@@ -7,10 +7,10 @@ with open(path.join(top_level_directory, 'README.md'), encoding='utf-8') as file
 
 setup(
     name='nextbox_ui_plugin',
-    version='1.0.2',
+    version='1.0.3',
     url='https://github.com/iDebugAll/nextbox-ui-plugin',
-    download_url='https://github.com/iDebugAll/nextbox-ui-plugin/archive/v1.0.2.tar.gz',
-    description='Next-Gen topology visualization plugin for Netbox powered by topoSphere SDK.',
+    download_url='https://github.com/iDebugAll/nextbox-ui-plugin/archive/v1.0.3.tar.gz',
+    description='A Next-Gen Topology Visualization Plugin for NetBox Powered by topoSphere SDK.',
     long_description=long_description,
     long_description_content_type='text/markdown',
     author='Igor Korotchenkov',
