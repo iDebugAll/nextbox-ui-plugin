@@ -371,6 +371,11 @@ def get_topology(nb_devices_qs, params):
         # Passive cabling devices use Rear and Front Ports.
         links_from_device = Cable.objects.filter(terminations__cable_end='A', terminations___device_id=nb_device.id)
         links_to_device = Cable.objects.filter(terminations__cable_end='B', terminations___device_id=nb_device.id)
+
+        # Filter out cables with incomplete terminations
+        links_from_device = [c for c in links_from_device if (c.a_terminations and c.b_terminations)]
+        links_to_device = [c for c in links_to_device if (c.a_terminations and c.b_terminations)]
+        
         interfaces_found = False
         if links_from_device:
             for link in links_from_device:
@@ -396,7 +401,7 @@ def get_topology(nb_devices_qs, params):
             continue
 
         node_data = {
-            'id': nb_device.name,
+            'id': f'device-{nb_device.id}',
             'name': nb_device.name,
             'label': {'text': nb_device.name},
             'layer': get_node_layer_sort_preference(
@@ -453,8 +458,8 @@ def get_topology(nb_devices_qs, params):
         link_url = link.get_absolute_url()
         edge_data = {
             "label": f"Cable {link.id}",
-            "source": link.a_terminations[0].device.name,
-            "target": link.b_terminations[0].device.name,
+            "source": f"device-{link.a_terminations[0].device.id}",
+            "target": f"device-{link.b_terminations[0].device.id}",
             "sourceInterfaceLabel": if_shortname(link.a_terminations[0].name),
             "targetInterfaceLabel": if_shortname(link.b_terminations[0].name),
             "customAttributes": {
@@ -490,22 +495,33 @@ def get_topology(nb_devices_qs, params):
         # identify segmented cable paths between end-devices
         if len(cable_path) < 2:
             continue
-        if isinstance(cable_path[0][0][0], Interface) and isinstance(cable_path[-1][2][0], Interface):
+
+        side_a_interface = cable_path[0][0]
+        side_b_interface = cable_path[-1][2]
+        if not (side_a_interface and side_b_interface):
+            continue
+        else:
+            side_a_interface = side_a_interface[0]
+            side_b_interface = side_b_interface[0]
+
+        if isinstance(side_a_interface, Interface) and isinstance(side_b_interface, Interface):
             if set([c[1][0] for c in cable_path]) in [set([c[1][0] for c in x]) for x in multi_cable_connections]:
                 continue
             multi_cable_connections.append(cable_path)
     for cable_path in multi_cable_connections:
+        source_device_id = f"device-{side_a_interface.device.id}"
+        target_device_id = f"device-{side_b_interface.device.id}"
         topology_dict['edges'].append({
-            'source': cable_path[0][0][0].device.name,
-            'target': cable_path[-1][2][0].device.name,
-            "sourceInterfaceLabel": if_shortname(cable_path[0][0][0].name),
-            "targetInterfaceLabel": if_shortname(cable_path[-1][2][0].name),
+            'source': source_device_id,
+            'target': target_device_id,
+            "sourceInterfaceLabel": if_shortname(side_a_interface.name),
+            "targetInterfaceLabel": if_shortname(side_b_interface.name),
             "isLogicalMultiCable": True,
             "customAttributes": {
                 "name": f"Multi-Cable Connection",
-                "dcimCableURL": f"/dcim/interfaces/{cable_path[0][0][0].id}/trace/",
-                "source": link.a_terminations[0].device.name,
-                "target": link.b_terminations[0].device.name,
+                "dcimCableURL": f"/dcim/interfaces/{side_a_interface.id}/trace/",
+                "source": side_a_interface.device.name,
+                "target": side_b_interface.device.name,
             }
         })
     return topology_dict, device_roles, multi_cable_connections, all_device_tags
