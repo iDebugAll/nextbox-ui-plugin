@@ -5,7 +5,7 @@ from django.views.generic import View
 from dcim.models import *
 from ipam.models import *
 from circuits.models import *
-from .models import SavedTopology
+from extras.models import SavedFilter
 from . import forms, filters
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.conf import settings
@@ -247,101 +247,6 @@ def filter_tags(tags):
         tags = filtered_tags
     return tags
 
-def get_vlan_topology(nb_devices_qs, vlans):
-
-    topology_dict = {'nodes': [], 'edges': []}
-    device_roles = set()
-    all_device_tags = set()
-    multi_cable_connections = []
-    vlan = VLAN.objects.get(id=vlans)
-    interfaces = vlan.get_interfaces()
-    filtred_devices = [d.id for d in nb_devices_qs]
-    filtred_interfaces = []
-    for interface in interfaces:
-        if interface.is_connectable:
-            direct_device_id = interface.device.id
-            interface_trace = interface.trace()
-            if len(interface_trace) != 0:
-                termination_b_iface = interface_trace[-1][-1]
-                connected_device_id = termination_b_iface.device.id
-                if (direct_device_id in filtred_devices) or (direct_device_id in filtred_devices):
-                    filtred_interfaces.append(interface)
-
-    
-
-    devices = []
-    for interface in filtred_interfaces:
-        if interface.is_connectable:
-            if interface.device not in devices:
-                devices.append(interface.device)
-            interface_trace = interface.trace()
-            if len(interface_trace) != 0:
-                termination_b_iface = interface_trace[-1][-1]
-                if termination_b_iface.device not in devices:
-                    devices.append(termination_b_iface.device)
-         
-
-    device_ids = [d.id for d in devices]
-    for device in devices:
-        device_is_passive = False
-        device_url = device.get_absolute_url()
-        if NETBOX_CURRENT_VERSION >= version.parse("4.0.0"):
-            device_role_obj = device.role
-        else:
-            device_role_obj = device.device_role
-        primary_ip = ''
-        if device.primary_ip:
-            primary_ip = str(device.primary_ip.address)
-        tags = [str(tag) for tag in device.tags.names()]
-        for tag in tags:
-            all_device_tags.add((tag, not tag_is_hidden(tag)))
-        topology_dict['nodes'].append({
-            'id': device.name,
-            'name': device.name,
-            'label': {'text': device.name},
-            'dcimDeviceLink': device_url,
-            'primaryIP': primary_ip,
-            'serial_number': device.serial,
-            'model': device.device_type.model,
-            'deviceRole': device_role_obj.slug,
-            'layer': get_node_layer_sort_preference(
-                device_role_obj.slug
-                ),
-            'iconName': get_icon_type(
-                device.id
-                ),
-            'isPassive': device_is_passive,
-            'tags': tags,
-            })
-        is_visible = not (device_role_obj.slug in UNDISPLAYED_DEVICE_ROLE_SLUGS)
-        device_roles.add((device_role_obj.slug, device_role_obj.name, is_visible))
-    
-    mapped_links = []
-    for interface in filtred_interfaces:
-        if interface.is_connectable:
-            interface_trace = interface.trace()
-            if len(interface_trace) != 0:
-                source_cable = interface_trace[0]
-                dest_cable = interface_trace[-1]
-                mapping_link = [source_cable[0].device.id,dest_cable[-1].device.id]
-                if (mapping_link not in mapped_links) and (mapping_link.reverse() not in mapped_links):
-                    mapped_links.append(mapping_link)
-
-                    topology_dict['edges'].append({
-                        'id': source_cable[1].id,
-                        'dcimCableURL': source_cable[1].get_absolute_url(),
-                        'label': f"Cable {source_cable[1].id}",
-                        'source': source_cable[0].device.name,
-                        'target': dest_cable[-1].device.name,
-                        'sourceDeviceName': source_cable[0].device.name,
-                        'targetDeviceName': dest_cable[-1].device.name,
-                        "srcIfName": if_shortname(source_cable[0].name),
-                        "tgtIfName": if_shortname(dest_cable[-1].name),
-                        })
-
-    return topology_dict, device_roles, multi_cable_connections, list(all_device_tags)
-
-
 def get_topology(nb_devices_qs, params):
     display_unconnected = params.get('display_unconnected')
     display_passive = params.get('display_passive')
@@ -403,7 +308,7 @@ def get_topology(nb_devices_qs, params):
         node_data = {
             'id': f'device-{nb_device.id}',
             'name': nb_device.name,
-            'label': {'text': nb_device.name},
+            'label': nb_device.name,
             'layer': get_node_layer_sort_preference(
                 device_role_obj.slug
             ),
@@ -460,8 +365,10 @@ def get_topology(nb_devices_qs, params):
             "label": f"Cable {link.id}",
             "source": f"device-{link.a_terminations[0].device.id}",
             "target": f"device-{link.b_terminations[0].device.id}",
-            "sourceInterfaceLabel": if_shortname(link.a_terminations[0].name),
-            "targetInterfaceLabel": if_shortname(link.b_terminations[0].name),
+            "sourceInterface": link.a_terminations[0].name,
+            "sourceInterfaceLabel": {'text': if_shortname(link.a_terminations[0].name)},
+            "targetInterface": link.b_terminations[0].name,
+            "targetInterfaceLabel": {'text': if_shortname(link.b_terminations[0].name)},
             "customAttributes": {
                 "name": f"Cable {link.id}",
                 "dcimCableURL": link_url,
@@ -512,10 +419,12 @@ def get_topology(nb_devices_qs, params):
         source_device_id = f"device-{side_a_interface.device.id}"
         target_device_id = f"device-{side_b_interface.device.id}"
         topology_dict['edges'].append({
-            'source': source_device_id,
-            'target': target_device_id,
-            "sourceInterfaceLabel": if_shortname(side_a_interface.name),
-            "targetInterfaceLabel": if_shortname(side_b_interface.name),
+            "source": source_device_id,
+            "target": target_device_id,
+            "sourceInterface": link.a_terminations[0].name,
+            "sourceInterfaceLabel": {'text': if_shortname(link.a_terminations[0].name)},
+            "targetInterface": link.b_terminations[0].name,
+            "targetInterfaceLabel": {'text': if_shortname(link.b_terminations[0].name)},
             "isLogicalMultiCable": True,
             "customAttributes": {
                 "name": f"Multi-Cable Connection",
@@ -527,40 +436,6 @@ def get_topology(nb_devices_qs, params):
     return topology_dict, device_roles, multi_cable_connections, all_device_tags
 
 
-def get_saved_topology(id):
-    topology_dict = {}
-    device_roles = []
-    device_tags = []
-    device_roles_detailed = []
-    device_tags_detailed = []
-    layout_context = {}
-    topology_data = SavedTopology.objects.get(id=id)
-    if not topology_data:
-        return topology_dict, device_roles, device_tags, layout_context
-    topology_dict = dict(topology_data.topology)
-    if 'nodes' not in topology_dict:
-        return topology_dict, device_roles, device_tags, layout_context
-    device_roles = list(set([str(d.get('deviceRole')) for d in topology_dict['nodes'] if d.get('deviceRole')]))
-    for device_role in device_roles:
-        is_visible = not (device_role in UNDISPLAYED_DEVICE_ROLE_SLUGS)
-        device_role_obj = DeviceRole.objects.get(slug=device_role)
-        if not device_role_obj:
-            device_roles_detailed.append((device_role, device_role, is_visible))
-            continue
-        device_roles_detailed.append((device_role_obj.slug, device_role_obj.name, is_visible))
-    device_roles_detailed.sort(key=lambda i: get_node_layer_sort_preference(i[0]))
-    device_tags = set()
-    for device in topology_dict['nodes']:
-        if 'tags' not in device:
-            continue
-        for tag in device['tags']:
-            device_tags.add(str(tag))
-    device_tags = list(device_tags)
-    device_tags_detailed = list([(tag, not tag_is_hidden(tag)) for tag in device_tags])
-    layout_context = dict(topology_data.layout_context)
-    return topology_dict, device_roles_detailed, device_tags_detailed, layout_context
-
-
 class TopologyView(PermissionRequiredMixin, View):
     """Generic Topology View"""
     permission_required = ('dcim.view_site', 'dcim.view_device', 'dcim.view_cable')
@@ -570,45 +445,39 @@ class TopologyView(PermissionRequiredMixin, View):
 
     def get(self, request):
 
-        if not request.GET:
-            self.queryset = Device.objects.none()
-        elif 'saved_topology_id' in request.GET:
+        clean_request = request.GET.copy()
+
+        if not clean_request:
             self.queryset = Device.objects.none()
 
-        display_unconnected = request.GET.get('display_unconnected')
-        if display_unconnected is not None:
-            display_unconnected = display_unconnected.lower == 'true'
+        self.queryset = self.filterset(clean_request, self.queryset).qs
 
-        display_passive = request.GET.get('display_passive')
-        if display_passive is not None:
-            display_passive = display_passive.lower() == 'true'
+        saved_filter = None
+        if 'filter_id' in clean_request and clean_request['filter_id']:
+            filter_id = clean_request['filter_id']
+            saved_filter = SavedFilter.objects.get(pk=filter_id)
+
+        if saved_filter:
+            # Extract only plugin-specific filters from the SavedFilter.
+            # All NetBox-native filters are handled by filtersets.
+            display_unconnected = saved_filter.parameters.get('display_unconnected', [DISPLAY_UNCONNECTED])[0]
+            display_passive = saved_filter.parameters.get('display_passive', [DISPLAY_PASSIVE_DEVICES])[0]
         else:
+            display_unconnected = DISPLAY_UNCONNECTED
             display_passive = DISPLAY_PASSIVE_DEVICES
 
+        if clean_request.get('display_unconnected') is not None:
+            display_unconnected = clean_request.get('display_unconnected')
+
+        if clean_request.get('display_passive') is not None:
+            display_passive = clean_request.get('display_passive')
+
         params = {
-            'display_unconnected': display_unconnected,
-            'display_passive': display_passive,
+            'display_unconnected': str(display_unconnected).lower() == 'true',
+            'display_passive': str(display_passive).lower() == 'true',
         }
 
-        saved_topology_id = request.GET.get('saved_topology_id')
-        layout_context = {}
-
-        if saved_topology_id is not None:
-            topology_dict, device_roles, device_tags, layout_context = get_saved_topology(saved_topology_id)
-        else:
-            vlans = []
-            if 'vlan_id' in request.GET:
-                clean_request = request.GET.copy()
-                clean_request.pop('vlan_id')
-                vlans = request.GET.get('vlan_id')
-            else:
-                clean_request = request.GET.copy()
-
-            self.queryset = self.filterset(clean_request, self.queryset).qs
-            if len(vlans) == 0:
-                topology_dict, device_roles, multi_cable_connections, device_tags = get_topology(self.queryset, params)
-            else:
-                topology_dict, device_roles, multi_cable_connections, device_tags = get_vlan_topology(self.queryset, vlans)
+        topology_dict, device_roles, multi_cable_connections, device_tags = get_topology(self.queryset, params)
 
         return render(request, self.template_name, {
             'source_data': json.dumps(topology_dict),

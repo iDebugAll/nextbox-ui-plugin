@@ -1,5 +1,11 @@
 
 
+function decodeSanitizedString(sanitizedStr) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(sanitizedStr, 'text/html');
+    return doc.documentElement.textContent;
+}
+
 function showModal(titleConfig, tableData) {
     const container = document.getElementById('topology-container');
 
@@ -100,13 +106,13 @@ function hideModal() {
     }
 }
 
-window.addEventListener('topoSphere.nodeClicked', (event) => {
+function nodeClickHandler(event) {
     const { nodeId, nodeData, click } = event.detail;
     // Render Node modal window on right mouse button click only
     if (click.button !== 2) return;
     const titleConfig = {
         text: nodeData?.customAttributes?.name,
-        href: nodeData?.customAttributes?.dcimDeviceLink,
+        href: decodeSanitizedString(nodeData?.customAttributes?.dcimDeviceLink),
     }
     const tableContent = [
         ['Model', nodeData?.customAttributes?.model || '–'],
@@ -115,14 +121,14 @@ window.addEventListener('topoSphere.nodeClicked', (event) => {
         ['Primary IP', nodeData?.customAttributes?.primaryIP || '–'],
     ]
     showModal(titleConfig, tableContent);
-});
+}
 
-window.addEventListener('topoSphere.edgeClicked', (event) => {
+function edgeClickHandler(event) {
     const { edgeId, edgeData, click } = event.detail;
     // Render Edge modal window on right mouse button click only
     if (click.button !== 2) return;
     let linkName = edgeData?.customAttributes?.name;
-    let linkHref = edgeData?.customAttributes?.dcimCableURL;
+    let linkHref = decodeSanitizedString(edgeData?.customAttributes?.dcimCableURL);
     if (edgeData.isBundled) {
         linkName = 'LAG';
         linkHref = '';
@@ -136,4 +142,25 @@ window.addEventListener('topoSphere.edgeClicked', (event) => {
         ['Target', edgeData?.customAttributes?.target || '–'],
     ]
     showModal(titleConfig, tableContent);
+}
+
+
+window.addEventListener('topoSphere.nodeClicked', (event) => {
+    event.preventDefault();
+    nodeClickHandler(event);
+});
+
+window.addEventListener('topoSphere.nodeDoubleTapped', (event) => {
+    event.preventDefault();
+    nodeClickHandler(event);
+});
+
+window.addEventListener('topoSphere.edgeClicked', (event) => {
+    event.preventDefault();
+    edgeClickHandler(event);
+});
+
+window.addEventListener('topoSphere.edgeDoubleTapped', (event) => {
+    event.preventDefault();
+    edgeClickHandler(event);
 });
