@@ -5,7 +5,7 @@ from django.views.generic import View
 from dcim.models import *
 from ipam.models import *
 from circuits.models import *
-from .models import SavedTopology
+from extras.models import SavedFilter
 from . import forms, filters
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.conf import settings
@@ -445,24 +445,36 @@ class TopologyView(PermissionRequiredMixin, View):
 
     def get(self, request):
 
-        if not request.GET:
-            self.queryset = Device.objects.none()
-        elif 'saved_topology_id' in request.GET:
+        clean_request = request.GET.copy()
+
+        if not clean_request:
             self.queryset = Device.objects.none()
 
-        display_unconnected = request.GET.get('display_unconnected')
-        if display_unconnected is not None:
-            display_unconnected = display_unconnected.lower == 'true'
+        self.queryset = self.filterset(clean_request, self.queryset).qs
 
-        display_passive = request.GET.get('display_passive')
-        if display_passive is not None:
-            display_passive = display_passive.lower() == 'true'
+        saved_filter = None
+        if 'filter_id' in clean_request and clean_request['filter_id']:
+            filter_id = clean_request['filter_id']
+            saved_filter = SavedFilter.objects.get(pk=filter_id)
+
+        if saved_filter:
+            # Extract only plugin-specific filters from the SavedFilter.
+            # All NetBox-native filters are handled by filtersets.
+            display_unconnected = saved_filter.parameters.get('display_unconnected', [DISPLAY_UNCONNECTED])[0]
+            display_passive = saved_filter.parameters.get('display_passive', [DISPLAY_PASSIVE_DEVICES])[0]
         else:
+            display_unconnected = DISPLAY_UNCONNECTED
             display_passive = DISPLAY_PASSIVE_DEVICES
 
+        if clean_request.get('display_unconnected') is not None:
+            display_unconnected = clean_request.get('display_unconnected')
+
+        if clean_request.get('display_passive') is not None:
+            display_passive = clean_request.get('display_passive')
+
         params = {
-            'display_unconnected': display_unconnected,
-            'display_passive': display_passive,
+            'display_unconnected': str(display_unconnected).lower() == 'true',
+            'display_passive': str(display_passive).lower() == 'true',
         }
 
         topology_dict, device_roles, multi_cable_connections, device_tags = get_topology(self.queryset, params)
