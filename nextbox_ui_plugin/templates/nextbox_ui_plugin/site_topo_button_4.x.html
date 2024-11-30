@@ -1,0 +1,26 @@
+<button type="button" class="btn btn-green" data-bs-toggle="modal" data-bs-target="#topology_modal" data-bs-obj="{{ object.name }}" title="Show site topology">
+    <i class="mdi mdi-map-search-outline"></i>
+    Topology
+</button>
+
+<div class="modal fade" id="topology_modal" tabindex="-1" role="dialog" aria-labelledby="topologyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-fullscreen-md-down" role="document">
+        <div class="modal-content d-flex flex-column" style="height: 90vh;">
+            <div class="modal-header">
+                <h5 class="modal-title" id="topologyModalLabel" style="flex-grow: 1; text-align: center;">
+                    <a href="{% url 'plugins:nextbox_ui_plugin:topology' %}?site_id={{ object.id }}">{{ object.name }} Topology</a>
+                </h5>
+                <button type="button" class="btn btn-sm btn-danger" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            
+            <div class="modal-body p-0 flex-grow-1">
+                <iframe 
+                    src="{% url 'plugins:nextbox_ui_plugin:site_topology' %}?site_id={{ object.id }}" 
+                    style="width: 100%; height: 100%; border: none;">
+                </iframe>
+            </div>
+        </div>
+    </div>
+</div>

@@ -491,3 +491,6 @@ class TopologyView(PermissionRequiredMixin, View):
             'model': Device,
             'requestGET': dict(request.GET),
         })
+
+class SiteTopologyView(TopologyView):
+    template_name = 'nextbox_ui_plugin/site_topology_4.x.html'

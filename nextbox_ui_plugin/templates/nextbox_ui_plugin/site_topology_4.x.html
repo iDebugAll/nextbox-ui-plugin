@@ -1,0 +1,21 @@
+{% load helpers %}
+{% load plugins %}
+{% load static %}
+
+
+{% block content %}
+<div id="topology-container" style="width: 100%; height: 96vh;"></div>
+{% endblock content %}
+
+{% block javascript %}
+<script type="text/javascript">
+    window.initialLayout = '{{ initial_layout|default:"layered" }}';
+    window.topologyData = {{ source_data|safe }};
+    window.netbox_csrf_token = '{{ csrf_token }}'
+</script>
+
+<script src="{% static 'nextbox_ui_plugin/topoSphere/topoSphere.js' %}"></script>
+<script src="{% static 'nextbox_ui_plugin/topoSphereApp.js' %}"></script>
+<script src="{% static 'nextbox_ui_plugin/modal.js' %}"></script>
+
+{% endblock javascript %}
