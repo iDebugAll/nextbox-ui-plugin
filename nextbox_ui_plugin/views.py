@@ -418,13 +418,15 @@ def get_topology(nb_devices_qs, params):
     for cable_path in multi_cable_connections:
         source_device_id = f"device-{side_a_interface.device.id}"
         target_device_id = f"device-{side_b_interface.device.id}"
+        side_a_interface = cable_path[0][0][0]
+        side_b_interface = cable_path[-1][2][0]
         topology_dict['edges'].append({
             "source": source_device_id,
             "target": target_device_id,
-            "sourceInterface": link.a_terminations[0].name,
-            "sourceInterfaceLabel": {'text': if_shortname(link.a_terminations[0].name)},
-            "targetInterface": link.b_terminations[0].name,
-            "targetInterfaceLabel": {'text': if_shortname(link.b_terminations[0].name)},
+            "sourceInterface": side_a_interface.name,
+            "sourceInterfaceLabel": {'text': if_shortname(side_a_interface.name)},
+            "targetInterface": side_b_interface.name,
+            "targetInterfaceLabel": {'text': if_shortname(side_b_interface.name)},
             "isLogicalMultiCable": True,
             "customAttributes": {
                 "name": f"Multi-Cable Connection",
