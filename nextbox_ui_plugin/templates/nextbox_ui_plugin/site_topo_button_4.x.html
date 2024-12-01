@@ -1,0 +1,53 @@
+<button type="button" class="btn btn-green" data-bs-toggle="modal" data-bs-target="#topology_modal" data-bs-obj="{{ object.name }}" title="Show site topology">
+    <i class="mdi mdi-map-search-outline"></i>
+    Topology
+</button>
+
+<div class="modal fade" id="topology_modal" tabindex="-1" role="dialog" aria-labelledby="topologyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-fullscreen-md-down" role="document">
+        <div class="modal-content d-flex flex-column" style="height: 90vh;">
+            <div class="modal-header" style="justify-content: center; width: 100%;">
+                <h5 class="modal-title" id="topologyModalLabel">
+                    <a href="{% url 'plugins:nextbox_ui_plugin:topology' %}?site_id={{ object.id }}">{{ object.name }} Site Topology</a>
+                </h5>
+                <button type="button" class="btn btn-sm btn-danger" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 10px;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            
+            <div class="modal-body p-0 flex-grow-1">
+                <div id="spinner" class="d-flex justify-content-center align-items-center" style="height: 100%;">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <iframe 
+                    id="iframe"
+                    src="{% url 'plugins:nextbox_ui_plugin:site_topology' %}?site_id={{ object.id }}">
+                </iframe>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var modal = document.getElementById('topology_modal');
+    var isIframeLoaded = false;
+    modal.addEventListener('show.bs.modal', function () {
+        var iframe = modal.querySelector('#iframe');
+        var spinner = modal.querySelector('#spinner');
+        if (iframe.contentWindow.topoSphere) {
+            spinner.setAttribute('style', 'display: none !important;');
+            iframe.setAttribute('style', 'width: 100%; height: 100%; border: none; margin: 0; display: block; overflow: hidden;');
+            isIframeLoaded = true;
+            return;
+        }
+        spinner.style.display = 'flex';
+        iframe.setAttribute('style', 'display: none;');
+        iframe.addEventListener('load', function() {
+            spinner.setAttribute('style', 'display: none !important;');
+            iframe.setAttribute('style', 'width: 100%; height: 100%; border: none; margin: 0; display: block; overflow: hidden;');
+            isIframeLoaded = true;
+        }, { once: true });
+    });
+</script>
