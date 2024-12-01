@@ -3,11 +3,13 @@
 {% load static %}
 
 
-{% block content %}
-<div id="topology-container" style="width: 100%; height: 96vh;"></div>
-{% endblock content %}
+<body style="background-color: rgba(0,0,0,0.2); margin: 0; overflow: hidden;">
+    <div id="topology-container" style="width: 100%; height: 100vh;"></div>
+</body>
+
 
 {% block javascript %}
+
 <script type="text/javascript">
     window.initialLayout = '{{ initial_layout|default:"layered" }}';
     window.topologyData = {{ source_data|safe }};
