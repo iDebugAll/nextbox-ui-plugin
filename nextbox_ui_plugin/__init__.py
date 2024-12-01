@@ -11,7 +11,7 @@ class NextBoxUIConfig(PluginConfig):
     name = 'nextbox_ui_plugin'
     verbose_name = 'NextBox UI'
     description = 'A Next-Gen Topology Visualization Plugin for NetBox Powered by topoSphere SDK.'
-    version = '1.0.5'
+    version = '1.0.7'
     author = 'Igor Korotchenkov'
     author_email = 'iDebugAll@gmail.com'
     base_url = 'nextbox-ui'
