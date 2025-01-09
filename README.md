@@ -4,6 +4,17 @@ NextBox UI is a Next Generation topology visualization plugin for [NetBox](https
 
 The Plugin delivers adaptive and scalable network topology maps, featuring advanced auto-layout algorithms, extended Filters, and multiple export options. Designed for efficiency and flexibility, NextBox UI enhances the visualization and management of complex network infrastructures within NetBox, providing users with intuitive tools to customize views, streamline network planning, and facilitate comprehensive data analysis.
 
+## ⭐️ Community Survey ⭐️
+
+> **We value your feedback!**  
+> Since launching v1.0, NextBox-UI Plugin with topoSphere has experienced rapid growth.</br>
+> Please help shape its future by taking a brief 5-minute anonymous survey about your experience and feature needs:
+>
+> 👉 [Take the Survey Now](https://forms.gle/XN8SB6UdytjPrbh86)
+
+</br>
+
+
 ![](samples/topology_viewer_light_mode.png)
 *Now with Dark Mode!*
 ![](samples/topology_viewer_dark_mode.png)
