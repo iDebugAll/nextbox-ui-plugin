@@ -28,6 +28,7 @@ The Plugin delivers adaptive and scalable network topology maps, featuring advan
 | NetBox 3.7.x   | == v0.14.0      |
 | NetBox 4.0.x   | >= v0.15.0      |
 | NetBox 4.1.x   | >= v1.0.0       |
+| NetBox 4.2.x   | >= v1.0.7       |
 
 
 # Installation
