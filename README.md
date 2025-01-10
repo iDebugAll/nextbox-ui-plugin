@@ -59,7 +59,7 @@ To ensure NextBox UI plugin is automatically re-installed during future upgrades
 ```
 
 ### Enable the Plugin
-In a global Netbox **configuration.py** configuration file, update or add PLUGINS parameter:
+In the global Netbox **plugins.py** configuration file, update or add `PLUGINS` parameter:
 ```python
 PLUGINS = [
     'nextbox_ui_plugin',
@@ -217,7 +217,15 @@ services:
   netbox: &netbox
     image: netbox-custom:latest
 ```
-Update a **configuration.py**. It is stored in netbox-docker/configuration/ by default. Update or add PLUGINS parameter and PLUGINS_CONFIG parameter as described above.
+
+In the global Netbox **plugins.py** configuration file, update or add `PLUGINS` parameter:
+```python
+PLUGINS = [
+    'nextbox_ui_plugin',
+]
+```
+
+Optionally, update `PLUGIN_CONFIG` parameter with required custom preferences.
 
 Rebuild the running docker containers:
 ```
@@ -225,15 +233,20 @@ $ cd netbox-docker
 $ docker-compose down
 $ docker-compose up -d
 ```
-Netbox Community Docker setup performs static file collection and database migrations on every startup. No manual actions are required.
+
+Collect static files:
+```
+$ docker-compose exec -u root  netbox python3 /opt/netbox/netbox/manage.py collectstatic --no-input
+```
 
 # Fixing Common Installation and Post-Upgrade Issues
 
 If you are experiencing some unexpected errors or visual behaviors after the installation or upgrade, please make sure that you execute the following steps first:
 
-1. Clear your browser cache and reload the page.
-2. Re-collect static files: `(venv) $ python3 manage.py collectstatic --clear`.
-3. Re-apply database migrations: `(venv) $ python3 manage.py migrate`.
+1. Double-check the plugin name in the **plugins.py**. It's `nextbox_ui_plugin`.
+2. Make sure that the plugin is installed into Netbox venv.
+3. Clear your browser cache and reload the page.
+4. Re-collect static files: `(venv) $ python3 manage.py collectstatic --clear`.
 
 # Usage
 
