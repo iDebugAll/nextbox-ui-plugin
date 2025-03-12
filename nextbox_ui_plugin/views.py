@@ -14,7 +14,7 @@ import json
 import re
 
 
-NETBOX_CURRENT_VERSION = version.parse(settings.VERSION)
+NETBOX_CURRENT_VERSION = version.parse(settings.RELEASE.version)
 
 # Default NeXt UI icons
 SUPPORTED_ICONS = {
