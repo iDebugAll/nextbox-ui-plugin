@@ -3,7 +3,7 @@ from utilities.querysets import RestrictedQuerySet
 from django.conf import settings
 from packaging import version
 
-NETBOX_CURRENT_VERSION = version.parse(settings.VERSION)
+NETBOX_CURRENT_VERSION = version.parse(settings.RELEASE.version)
 
 def get_user_model():
     if NETBOX_CURRENT_VERSION >= version.parse("4.0.0"):
